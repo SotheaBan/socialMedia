@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "user",
     "Post",
     "Reaction",
+    "notification",
 
 ]
 
