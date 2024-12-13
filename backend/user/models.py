@@ -15,7 +15,3 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-class User(AbstractUser):
-    bio = models.TextField(max_length=500, null=True, blank=True)
