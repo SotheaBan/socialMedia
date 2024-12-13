@@ -12,12 +12,14 @@ from .serializers import UserRegisterSerializer
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import datetime
+import pytz
+
 
 # from datetime import timedelta
 
 
 class CustomTokenObtainPairView(APIView):
-    permission_classes = [AllowAny]  # Allow anyone to access this view
+    permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
         # Get email and password from request data
@@ -51,31 +53,28 @@ class CustomTokenObtainPairView(APIView):
         # Generate the tokens manually if user is valid
         from rest_framework_simplejwt.tokens import RefreshToken
 
-        # Generate the tokens manually if user is valid
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
 
-        # Calculate token expiration time (convert the Unix timestamp to a readable date)
+        # Get expiration time from JWT token
         exp_time = None
-        time_remaining = None
         try:
             access_token_obj = AccessToken(access_token)
             exp_timestamp = access_token_obj.payload.get("exp")
 
-            # Convert Unix timestamp to a timezone-aware datetime
-            naive_datetime = datetime.utcfromtimestamp(exp_timestamp)  # naive datetime
-            aware_datetime = timezone.make_aware(
-                naive_datetime, timezone=timezone.utc
-            )  # make it timezone-aware
-            exp_time = timezone.localtime(aware_datetime).strftime(
-                "%Y-%m-%d %H:%M:%S"
-            )  # convert to local time
+            # Convert the expiration time from UTC to Cambodia timezone (UTC+7)
+            utc_exp_time = datetime.utcfromtimestamp(exp_timestamp).replace(
+                tzinfo=pytz.utc
+            )
+            cambodia_tz = pytz.timezone("Asia/Phnom_Penh")  # Cambodia timezone
+            local_exp_time = utc_exp_time.astimezone(cambodia_tz)
 
-            # Calculate remaining time in minutes
-            time_diff = aware_datetime - timezone.now()
-            time_remaining = (
-                time_diff.total_seconds() // 60
-            )  # remaining time in minutes
+            # Convert to string format for response
+            exp_time = local_exp_time.strftime("%Y-%m-%d %H:%M:%S")
+
+            # Calculate time remaining (in minutes)
+            now = timezone.now()
+            time_remaining = (local_exp_time - now).total_seconds() / 60.0  # in minutes
         except TokenError:
             exp_time = None
             time_remaining = None
@@ -84,8 +83,8 @@ class CustomTokenObtainPairView(APIView):
         custom_response_data = {
             "access_token": access_token,
             "refresh_token": str(refresh),
-            "token_expiration": exp_time,  # Human-readable expiration time
-            "time_remaining_minutes": time_remaining,  # Remaining time in minutes
+            "token_expiration": exp_time,
+            "time_remaining_minutes": time_remaining,
             "user": {
                 "id": user.id,
                 "username": user.username,
