@@ -9,5 +9,4 @@ class Post(models.Model):
     updated_at = models.DateTimeField()
     likes = models.IntegerField()
 
-    def __str__(self):
-        return self.content
+   
