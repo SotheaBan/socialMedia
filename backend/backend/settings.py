@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "user",
+    "Post",
+    "Reaction",
+
 ]
 
 
@@ -127,3 +130,11 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+
+# Path where uploaded files will be stored
+MEDIA_URL = '/media/'
+
+# Absolute path to the directory where files will be stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
