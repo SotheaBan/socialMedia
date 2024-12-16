@@ -30,31 +30,40 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ["id", "username", "email", "profile_picture", "bio"]
 
     def update(self, instance, validated_data):
-        # Check if the new username is already taken
+        updated_fields = {}  # Store the fields that were updated
+
+        # Check and update the username
         username = validated_data.get("username", instance.username)
-        if (
-            username != instance.username
-            and User.objects.filter(username=username).exists()
-        ):
-            raise serializers.ValidationError(
-                {"username": "This username is already taken."}
-            )
+        if username != instance.username:
+            instance.username = username
+            updated_fields["username"] = username
 
-        # Check if the new email is already taken
+        # Check and update the email
         email = validated_data.get("email", instance.email)
-        if email != instance.email and User.objects.filter(email=email).exists():
-            raise serializers.ValidationError(
-                {"email": "This email is already registered."}
-            )
+        if email != instance.email:
+            instance.email = email
+            updated_fields["email"] = email
 
-        # Update fields
-        instance.username = username
-        instance.email = email
-        instance.bio = validated_data.get("bio", instance.bio)
-        instance.profile_picture = validated_data.get(
+        # Check and update the bio
+        bio = validated_data.get("bio", instance.bio)
+        if bio != instance.bio:
+            instance.bio = bio
+            updated_fields["bio"] = bio
+
+        # Check and update the profile picture
+        profile_picture = validated_data.get(
             "profile_picture", instance.profile_picture
         )
+        if profile_picture != instance.profile_picture:
+            instance.profile_picture = profile_picture
+            updated_fields["profile_picture"] = profile_picture
 
         # Save the updated instance
         instance.save()
+
+        # Now that the instance is saved, we can access the profile_picture URL
+        if instance.profile_picture:
+            updated_fields["profile_picture"] = instance.profile_picture.url
+
+        # Return the updated instance (not a tuple)
         return instance

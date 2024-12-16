@@ -179,6 +179,30 @@ class UserListView(APIView):
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
 
+    def get(self, request, id=None):
+
+        # Get the user object based on the provided UUID ID
+        user = get_object_or_404(User, id=id)
+
+        # Check if the requesting user is authorized to view the profile
+        if request.user.id != user.id:
+            return Response(
+                {"status": "error", "message": "You can only view your own profile."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Serialize the user profile
+        serializer = UserProfileSerializer(user)
+
+        return Response(
+            {
+                "status": "success",
+                "message": "User profile retrieved successfully.",
+                "data": serializer.data,
+            },
+            status=status.HTTP_200_OK,
+        )
+
     def put(self, request, id=None):
         # Get the user object based on the provided UUID ID
         user = get_object_or_404(User, id=id)
@@ -220,4 +244,23 @@ class UserProfileView(APIView):
         return Response(
             {"status": "error", "message": "Invalid data.", "data": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # DELETE method to delete the profile
+    def delete(self, request, id=None):
+        user = get_object_or_404(User, id=id)
+
+        # Ensure the user can only delete their own profile
+        if request.user.id != user.id:
+            return Response(
+                {"status": "error", "message": "You can only delete your own profile."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Deleting the user profile
+        user.delete()
+
+        return Response(
+            {"status": "success", "message": "User profile deleted successfully."},
+            status=status.HTTP_204_NO_CONTENT,
         )
