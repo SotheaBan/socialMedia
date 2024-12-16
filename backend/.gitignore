@@ -44,4 +44,5 @@ backend/db.sqlite3
 *~                       # Backup files created by text editors
 
 
-media
+
+backend/db.sqlite3
