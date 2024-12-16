@@ -1,5 +1,6 @@
 # Create your views here.
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -12,6 +13,7 @@ from .serializers import UserRegisterSerializer
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import datetime
+from uuid import UUID
 import pytz
 
 
@@ -129,9 +131,19 @@ class Home(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
+    def get(self, request, user_id=None):
+        # If user_id is provided in the URL, fetch user by UUID
+        if user_id:
+            try:
+                user = get_object_or_404(get_user_model(), id=user_id)
+            except (ValueError, UUIDError):
+                return Response(
+                    {"detail": "Invalid UUID format."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            # If no user_id is passed, use the logged-in user
+            user = request.user
 
-        content = {"message": f"Hello {user.username} user!"}
-
+        content = {"message": f"Hello {user.username}!"}
         return Response(content)

@@ -1,9 +1,11 @@
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
 # Custom User Model
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     profile_picture = models.ImageField(
         upload_to="profile_pics/", null=True, blank=True
     )
