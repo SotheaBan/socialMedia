@@ -9,33 +9,18 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.permissions import AllowAny
-from .serializers import UserRegisterSerializer, UserListSerializer
+from .serializers import (
+    UserRegisterSerializer,
+    UserListSerializer,
+    UserProfileSerializer,
+)
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import datetime
 from .utils.responses import generate_response
 from rest_framework.pagination import PageNumberPagination
 import pytz
-
-
-class UserListView(APIView):
-    authentication_classes = [JWTAuthentication]  # Require authentication
-    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
-
-    def get(self, request):
-        # Get all users
-        users = get_user_model().objects.all()
-
-        # Pagination
-        paginator = PageNumberPagination()
-        paginator.page_size = 10  # You can adjust the page size
-        paginated_users = paginator.paginate_queryset(users, request)
-
-        # Serialize the data
-        serializer = UserListSerializer(paginated_users, many=True)
-
-        # Return paginated response
-        return paginator.get_paginated_response(serializer.data)
+from .models import User
 
 
 class CustomTokenObtainPairView(APIView):
@@ -169,3 +154,70 @@ class Home(APIView):
 
         content = {"message": f"Hello {user.username}!"}
         return Response(content)
+
+
+class UserListView(APIView):
+    authentication_classes = [JWTAuthentication]  # Require authentication
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def get(self, request):
+        # Get all users
+        users = get_user_model().objects.all()
+
+        # Pagination
+        paginator = PageNumberPagination()
+        paginator.page_size = 10  # You can adjust the page size
+        paginated_users = paginator.paginate_queryset(users, request)
+
+        # Serialize the data
+        serializer = UserListSerializer(paginated_users, many=True)
+
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
+
+
+class UserProfileView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def put(self, request, id=None):
+        # Get the user object based on the provided UUID ID
+        user = get_object_or_404(User, id=id)
+
+        # Check if the user is updating their own profile
+        if request.user.id != user.id:
+            return Response(
+                {"status": "error", "message": "You can only update your own profile."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # Validate and update the user profile using the serializer
+        serializer = UserProfileSerializer(
+            user, data=request.data, partial=True
+        )  # partial=True allows partial updates
+
+        if serializer.is_valid():
+            updated_user = serializer.save()  # Save the updated user profile
+            return Response(
+                {
+                    "status": "success",
+                    "code": status.HTTP_200_OK,
+                    "message": "User profile updated successfully.",
+                    "data": {
+                        "id": updated_user.id,
+                        "username": updated_user.username,
+                        "email": updated_user.email,
+                        "profile_picture": (
+                            updated_user.profile_picture.url
+                            if updated_user.profile_picture
+                            else None
+                        ),
+                        "bio": updated_user.bio,
+                    },
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        return Response(
+            {"status": "error", "message": "Invalid data.", "data": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
