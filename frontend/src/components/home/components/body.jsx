@@ -42,7 +42,7 @@ const Body = () => {
                 {/* Author Image */}
                 <img
                 className="w-20 h-20 rounded-full"
-                src={post.author_image || "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"} // Fallback if no author image
+                src={post.profile_picture || "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"} // Fallback if no author image
                 alt={post.author || "Author"}
                 />
                 
@@ -69,12 +69,13 @@ const Body = () => {
             </div>
 
             {/* Post Content */}
-            <div>
-                <p className="text-lg text-gray-800">{post.content}</p>
+            <div className='ml-6 flex gap-4 justify-items-center'>
+                <p className="text-lg text-[#A303A0] font-bold">{post.author} :</p>
+                <p className="text-base text-gray-800">{post.content}</p>
             </div>
 
             {/* Post Likes */}
-            <div className="mt-3 text-sm text-gray-600">
+            <div className="mt-3 text-sm text-gray-600 ml-6">
                 <strong>Likes:</strong> {post.likes}
             </div>
             </li>
