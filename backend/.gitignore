@@ -20,7 +20,7 @@ build/
 *.pyc                    # Python bytecode files
 *.pyo                    # Python optimized bytecode files
 __pycache__/             # Python cache directories
-backend/db.sqlite3               
+db.sqlite3               
 
 # Django migrations
 */migrations/*           # Ignore all migration files
