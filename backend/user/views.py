@@ -55,22 +55,15 @@ class CustomTokenObtainPairView(APIView):
             access_token_obj = AccessToken(access_token)
             exp_timestamp = access_token_obj.payload.get("exp")
 
-            # Convert the expiration time from UTC to Cambodia timezone (UTC+7)
-            utc_exp_time = datetime.utcfromtimestamp(exp_timestamp).replace(
-                tzinfo=pytz.utc
-            )
-            cambodia_tz = pytz.timezone("Asia/Phnom_Penh")
-            local_exp_time = utc_exp_time.astimezone(cambodia_tz)
-
-            # Convert to string format for response
-            exp_time = local_exp_time.strftime("%Y-%m-%d %H:%M:%S")
-
             # Calculate time remaining (in minutes)
             now = timezone.now()
-            time_remaining = (local_exp_time - now).total_seconds() / 60.0  # in minutes
+            # Convert exp_timestamp to a datetime object and calculate remaining time
+            exp_time = datetime.utcfromtimestamp(exp_timestamp).replace(
+                tzinfo=timezone.utc
+            )
+            time_remaining = (exp_time - now).total_seconds() / 60.0  # in minutes
         except TokenError:
-            exp_time = None
-            time_remaining = None
+            pass  # If there's an error in decoding the token, we just return None for exp_time
 
         custom_response_data = {
             "access_token": access_token,
