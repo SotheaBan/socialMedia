@@ -42,3 +42,7 @@ db.sqlite3               # SQLite database file (if using SQLite)
 
 # Linux system files
 *~                       # Backup files created by text editors
+
+
+backend/db.sqlite3
+backend/media/
