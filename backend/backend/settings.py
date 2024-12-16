@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     "Post",
     "Reaction",
     "notification",
-
 ]
 
 
