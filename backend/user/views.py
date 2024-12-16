@@ -193,11 +193,11 @@ class UserProfileView(APIView):
         user = get_object_or_404(User, id=id)
 
         # Check if the requesting user is authorized to view the profile
-        if request.user.id != user.id:
-            return Response(
-                {"status": "error", "message": "You can only view your own profile."},
-                status=status.HTTP_403_FORBIDDEN,
-            )
+        # if request.user.id != user.id:
+        #     return Response(
+        #         {"status": "error", "message": "You can only view your own profile."},
+        #         status=status.HTTP_403_FORBIDDEN,
+        #     )
 
         serializer = UserProfileSerializer(user)
 

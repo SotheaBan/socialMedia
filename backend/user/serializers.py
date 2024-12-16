@@ -41,7 +41,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         ]
 
     def update(self, instance, validated_data):
-        updated_fields = {}  # Store the fields that were updated
+        updated_fields = {}
 
         # Check and update the username
         username = validated_data.get("username", instance.username)
@@ -69,7 +69,6 @@ class UserProfileSerializer(serializers.ModelSerializer):
             instance.profile_picture = profile_picture
             updated_fields["profile_picture"] = profile_picture
 
-        # Save the updated instance
         instance.save()
 
         # Now that the instance is saved, we can access the profile_picture URL
