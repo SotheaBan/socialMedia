@@ -199,6 +199,10 @@ class UserProfileView(APIView):
                 "status": "success",
                 "message": "User profile retrieved successfully.",
                 "data": serializer.data,
+                "followers": [follower.username for follower in user.followers.all()],
+                "following": [
+                    followed_user.username for followed_user in user.following.all()
+                ],
             },
             status=status.HTTP_200_OK,
         )
@@ -270,9 +274,6 @@ class FollowUnfollowView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, id=None):
-        """
-        Follow a user
-        """
         user_to_follow = get_object_or_404(User, id=id)
         user = request.user
 
@@ -315,9 +316,6 @@ class FollowUnfollowView(APIView):
         )
 
     def delete(self, request, id=None):
-        """
-        Unfollow a user
-        """
         user_to_unfollow = get_object_or_404(User, id=id)
         user = request.user
 
@@ -344,6 +342,7 @@ class FollowUnfollowView(APIView):
         return Response(
             {
                 "status": "success",
+                "code": status.HTTP_200_OK,
                 "message": f"You have unfollowed {user_to_unfollow.username}.",
             },
             status=status.HTTP_200_OK,
