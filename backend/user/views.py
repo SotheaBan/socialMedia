@@ -1,33 +1,41 @@
-# Create your views here.
+# Standard Library Imports
+from datetime import datetime
+from django.utils import timezone
+
+# Third-Party Imports
 from rest_framework import status
-from django.shortcuts import get_object_or_404
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
-from rest_framework.permissions import AllowAny
+from rest_framework.pagination import PageNumberPagination
+import pytz
+
+# Django Imports
+from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+
+# Import Serializers
 from .serializers import (
     UserRegisterSerializer,
     UserListSerializer,
     UserProfileSerializer,
 )
-from django.contrib.auth import get_user_model
-from django.utils import timezone
-from datetime import datetime
-from .utils.responses import generate_response
-from rest_framework.pagination import PageNumberPagination
-import pytz
+
+# Import Models
 from .models import User
+
+# Import custom response utility
+from .utils.responses import generate_response
 
 
 class CustomTokenObtainPairView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, *args, **kwargs):
-        # Get email and password from request data
         email = request.data.get("email")
         password = request.data.get("password")
 
@@ -166,7 +174,7 @@ class UserListView(APIView):
 
         # Pagination
         paginator = PageNumberPagination()
-        paginator.page_size = 10  # You can adjust the page size
+        paginator.page_size = 10
         paginated_users = paginator.paginate_queryset(users, request)
 
         # Serialize the data
@@ -191,7 +199,6 @@ class UserProfileView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        # Serialize the user profile
         serializer = UserProfileSerializer(user)
 
         return Response(
@@ -224,7 +231,7 @@ class UserProfileView(APIView):
         )  # partial=True allows partial updates
 
         if serializer.is_valid():
-            updated_user = serializer.save()  # Save the updated user profile
+            updated_user = serializer.save()
             return Response(
                 {
                     "status": "success",
