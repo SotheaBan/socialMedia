@@ -18,14 +18,15 @@ class SearchView(APIView):
         )
 
         posts = Post.objects.filter(
-            Q(content__icontains=query)
-        )
+            Q(content__icontains=query) | 
+            Q(author__username__icontains=query)  
+        ).select_related('author')  
 
         user_serializer = UserSerializer(users, many=True)
         post_serializer = PostSerializer(posts, many=True)
 
         return Response({
-            "user": user_serializer.data,
+            "users": user_serializer.data,  
             "posts": post_serializer.data
         }, status=status.HTTP_200_OK)
 
