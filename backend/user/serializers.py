@@ -22,3 +22,12 @@ class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email"]
+
+    def update(self, instance, validated_data):
+        instance.bio = validated_data.get("bio", instance.bio)
+        if "profile_picture" in validated_data:
+            instance.profile_picture = validated_data.get(
+                "profile_picture", instance.profile_picture
+            )
+        instance.save()
+        return instance
