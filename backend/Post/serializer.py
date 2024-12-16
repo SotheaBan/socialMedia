@@ -12,3 +12,8 @@ class UserPostSerializer(serializers.ModelSerializer):
     class Meta : 
         model = Post
         fields = ['content']
+
+class SearchUserSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Post
+        fields = '__all__'
