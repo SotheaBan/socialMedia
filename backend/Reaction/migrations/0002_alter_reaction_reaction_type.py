@@ -6,13 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('Reaction', '0001_initial'),
+        ("Reaction", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='reaction',
-            name='reaction_type',
-            field=models.CharField(choices=[('like', 'Like'), ('love', 'Love'), ('laugh', 'Laugh')], default='like', max_length=5),
+            model_name="reaction",
+            name="reaction_type",
+            field=models.CharField(
+                choices=[("like", "Like"), ("love", "Love"), ("laugh", "Laugh")],
+                default="like",
+                max_length=5,
+            ),
         ),
     ]

@@ -9,12 +9,33 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.permissions import AllowAny
-from .serializers import UserRegisterSerializer
+from .serializers import UserRegisterSerializer, UserListSerializer
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import datetime
 from .utils.responses import generate_response
+from rest_framework.pagination import PageNumberPagination
 import pytz
+
+
+class UserListView(APIView):
+    authentication_classes = [JWTAuthentication]  # Require authentication
+    permission_classes = [IsAuthenticated]  # Ensure the user is authenticated
+
+    def get(self, request):
+        # Get all users
+        users = get_user_model().objects.all()
+
+        # Pagination
+        paginator = PageNumberPagination()
+        paginator.page_size = 10  # You can adjust the page size
+        paginated_users = paginator.paginate_queryset(users, request)
+
+        # Serialize the data
+        serializer = UserListSerializer(paginated_users, many=True)
+
+        # Return paginated response
+        return paginator.get_paginated_response(serializer.data)
 
 
 class CustomTokenObtainPairView(APIView):
