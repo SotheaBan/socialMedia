@@ -270,16 +270,21 @@ class FollowUnfollowView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, id=None):
+        """
+        Follow a user
+        """
         user_to_follow = get_object_or_404(User, id=id)
         user = request.user
 
+        # Prevent following yourself
         if user.id == user_to_follow.id:
             return Response(
                 {"status": "error", "message": "You cannot follow yourself."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if user.is_following(user_to_follow):
+        # Prevent following the same user twice
+        if user_to_follow in user.following.all():
             return Response(
                 {
                     "status": "error",
@@ -291,25 +296,40 @@ class FollowUnfollowView(APIView):
         # Follow the user
         user.follow(user_to_follow)
 
+        # Prepare response data with user details
+        user_data = UserListSerializer(user_to_follow).data
+        user_data["is_following"] = True
+
         return Response(
             {
                 "status": "success",
+                "code": "status.HTTP_200_OK",
                 "message": f"You are now following {user_to_follow.username}.",
+                "data": {
+                    "user": user_data,
+                    "followers_count": user_to_follow.followers.count(),
+                    "following_count": user_to_follow.following.count(),
+                },
             },
             status=status.HTTP_200_OK,
         )
 
     def delete(self, request, id=None):
+        """
+        Unfollow a user
+        """
         user_to_unfollow = get_object_or_404(User, id=id)
         user = request.user
 
+        # Prevent unfollowing yourself
         if user.id == user_to_unfollow.id:
             return Response(
                 {"status": "error", "message": "You cannot unfollow yourself."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if not user.is_following(user_to_unfollow):
+        # Prevent unfollowing a user you're not following
+        if user_to_unfollow not in user.following.all():
             return Response(
                 {
                     "status": "error",

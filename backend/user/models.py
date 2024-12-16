@@ -17,3 +17,17 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+    # Follow a user
+    def follow(self, user):
+        if not self.is_following(user):
+            self.following.add(user)
+
+    # Unfollow a user
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.following.remove(user)
+
+    # Check if a user is following another user
+    def is_following(self, user):
+        return self.following.filter(id=user.id).exists()
