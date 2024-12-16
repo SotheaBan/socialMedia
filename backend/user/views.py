@@ -264,3 +264,67 @@ class UserProfileView(APIView):
             {"status": "success", "message": "User profile deleted successfully."},
             status=status.HTTP_204_NO_CONTENT,
         )
+
+
+class FollowUnfollowView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, id=None):
+        user_to_follow = get_object_or_404(User, id=id)
+        user = request.user
+
+        if user.id == user_to_follow.id:
+            return Response(
+                {"status": "error", "message": "You cannot follow yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if user.is_following(user_to_follow):
+            return Response(
+                {
+                    "status": "error",
+                    "message": f"You are already following {user_to_follow.username}.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Follow the user
+        user.follow(user_to_follow)
+
+        return Response(
+            {
+                "status": "success",
+                "message": f"You are now following {user_to_follow.username}.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    def delete(self, request, id=None):
+        user_to_unfollow = get_object_or_404(User, id=id)
+        user = request.user
+
+        if user.id == user_to_unfollow.id:
+            return Response(
+                {"status": "error", "message": "You cannot unfollow yourself."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if not user.is_following(user_to_unfollow):
+            return Response(
+                {
+                    "status": "error",
+                    "message": f"You are not following {user_to_unfollow.username}.",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Unfollow the user
+        user.unfollow(user_to_unfollow)
+
+        return Response(
+            {
+                "status": "success",
+                "message": f"You have unfollowed {user_to_unfollow.username}.",
+            },
+            status=status.HTTP_200_OK,
+        )
