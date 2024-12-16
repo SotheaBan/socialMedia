@@ -13,7 +13,7 @@ from .serializers import UserRegisterSerializer
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from datetime import datetime
-from uuid import UUID
+from .utils.responses import generate_response
 import pytz
 
 
@@ -26,24 +26,21 @@ class CustomTokenObtainPairView(APIView):
         password = request.data.get("password")
 
         if not email or not password:
-            return Response(
-                {"detail": "Email and password are required."},
-                status=status.HTTP_400_BAD_REQUEST,
+            return generate_response(
+                status="error", code=400, message="Email and password are required."
             )
 
         User = get_user_model()
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response(
-                {"detail": "Invalid email or password."},
-                status=status.HTTP_400_BAD_REQUEST,
+            return generate_response(
+                status="error", code=400, message="Invalid email or password."
             )
 
         if not user.check_password(password):
-            return Response(
-                {"detail": "Invalid email or password."},
-                status=status.HTTP_400_BAD_REQUEST,
+            return generate_response(
+                status="error", code=400, message="Invalid email or password."
             )
 
         # Generate the tokens manually if user is valid
@@ -80,14 +77,17 @@ class CustomTokenObtainPairView(APIView):
             "refresh_token": str(refresh),
             "token_expiration": exp_time,
             "time_remaining_minutes": time_remaining,
-            "user": {
-                "id": user.id,
-                "username": user.username,
-                "email": user.email,
-            },
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
         }
 
-        return Response(custom_response_data, status=status.HTTP_200_OK)
+        return generate_response(
+            status="success",
+            code=200,
+            message="Tokens generated successfully.",
+            data=custom_response_data,
+        )
 
 
 class RegisterUser(APIView):
@@ -98,33 +98,41 @@ class RegisterUser(APIView):
         User = get_user_model()
 
         if User.objects.filter(username=request.data.get("username")).exists():
-            return Response(
-                {"detail": "Username already taken."},
-                status=status.HTTP_400_BAD_REQUEST,
+            return generate_response(
+                status="error",
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Username already taken.",
             )
 
         if User.objects.filter(email=request.data.get("email")).exists():
-            return Response(
-                {"detail": "Email is already registered."},
-                status=status.HTTP_400_BAD_REQUEST,
+            return generate_response(
+                status="error",
+                code=status.HTTP_400_BAD_REQUEST,
+                message="Email is already registered.",
             )
-
         # If the username and email are not taken, proceed with registration
         serializer = UserRegisterSerializer(data=request.data)
 
         if serializer.is_valid():
             user = serializer.save()
-            return Response(
-                {
-                    "message": "User registered successfully.",
-                    "user": {
-                        "id": user.id,
-                        "username": user.username,
-                        "email": user.email,
-                    },
+            return generate_response(
+                status="success",
+                code=status.HTTP_201_CREATED,
+                message="User registered successfully.",
+                data={
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
                 },
-                status=status.HTTP_201_CREATED,
             )
+
+        # If serializer is invalid, return errors
+        return generate_response(
+            status="error",
+            code=status.HTTP_400_BAD_REQUEST,
+            message="Invalid data.",
+            data=serializer.errors,
+        )
 
 
 class Home(APIView):
@@ -136,7 +144,7 @@ class Home(APIView):
         if user_id:
             try:
                 user = get_object_or_404(get_user_model(), id=user_id)
-            except (ValueError, UUIDError):
+            except ValueError:
                 return Response(
                     {"detail": "Invalid UUID format."},
                     status=status.HTTP_400_BAD_REQUEST,
