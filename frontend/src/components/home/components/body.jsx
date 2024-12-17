@@ -46,10 +46,10 @@ const Body = () => {
                 </div>
           <hr className='w-full mt-7' />
           <ul className="flex flex-col items-center ">
-                {posts.map((post) => (
-                  <li key={post.id} className="mt-5 w-full max-w-4xl"> {/* Limit width of the post */}
+                {[...posts].reverse().map((post) => (
+                  <li key={post.id} className="mt-5 w-full max-w-4xl"> 
                     <div className="flex items-center gap-4 pt-6 ">
-                      {/* Author Image */}
+
                       <img
                         className="w-20 h-20 rounded-xl "
                         src={post.profile_picture || "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"}
@@ -57,9 +57,9 @@ const Body = () => {
                       />
                       
                       <div className="font-medium text-gray-700">
-                        {/* Author Name */}
+
                         <div className="text-xl text-[#490057] font-bold">{post.author}</div>
-                        {/* Time */}
+
                         <div className="text-xs text-[#A303A0]">
                           {new Date(post.created_at).toLocaleString()}
                         </div>
@@ -67,23 +67,21 @@ const Body = () => {
                     </div>
 
                     <div className="pt-5 p-5 flex justify-center items-center">
-                      {/* Post Image */}
+
                       {post.image && (
                         <img
                           src={post.image}
                           alt="Post Image"
-                          className="w-2/3 object-cover"  // Keeps image responsive
+                          className="w-2/3 object-cover"  
                         />
                       )}
                     </div>
 
-                    {/* Post Content */}
                     <div className="ml-6 flex gap-4 justify-start">
                       <p className="text-xl text-[#490057] font-medium">{post.author} </p>
                       <p className="text-lg font-light text-[#490057]">{post.content}</p>
                     </div>
 
-                    {/* Post Likes */}
                     <div className="mt-3 text-sm text-gray-600 ml-6  flex gap-7">
                         <div className='flex gap-3 text-center items-center font-bold text-xl'>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-[#490057]">

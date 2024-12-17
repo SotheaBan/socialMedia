@@ -7,17 +7,17 @@ import Suggestion  from './components/suggestion_friend';
 import PostPage from '../Post/postPage';
 function Home() {
   return (
-      <div className="bg-[#EEEEEE] overflow-hidden">
-        <div className='mr-5'>
+      <div className="bg-[#EEEEEE] overscroll-contain">
+        <div className=''>
           <Nav />
           <div className="grid grid-cols-7 h-screen"> 
             <div className="bg-[#490057] h-full">
               <Sidebar />
             </div>
-            <div className="col-span-5 overflow-y-auto overflow-hidden h-full w-fit rounded-xl"> 
+            <div className="col-span-4 overflow-y-auto  h-full w-fit rounded-xl ml-7"> 
               <Body />
             </div>
-            <div className=" h-full col-span-1 w-fit  overflow-hidden scrollbar-hidden">
+            <div className=" h-full col-span-2  overflow-hidden scrollbar-hidden w-64">
               <Suggestion />
             </div>
           </div>

@@ -2,12 +2,16 @@
 import './App.css';
 import './index.css';
 import Homepage from './components/home/homePage'
+import { BrowserRouter as Router } from 'react-router-dom';
+import AppRoutes from './Routes'; // Import your routing setup
 function App() {
 
 
   return (
     <>
-     <Homepage/>
+      <Router>
+          <AppRoutes />
+      </Router>
     </>
   )
 }
