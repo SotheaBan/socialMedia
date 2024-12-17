@@ -9,9 +9,13 @@ class Post(models.Model):
     updated_at = models.DateTimeField()
     likes = models.IntegerField()
 
+<<<<<<< HEAD
     def __str__(self):
 <<<<<<< HEAD
         return  self.content 
 =======
         return self.content
 >>>>>>> main
+=======
+   
+>>>>>>> sothea

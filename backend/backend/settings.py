@@ -41,13 +41,26 @@ INSTALLED_APPS = [
     "rest_framework",
     "user",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "Follow",
 =======
     "Post",
     "Reaction",
 
 >>>>>>> main
+=======
+    "Post",
+    "Reaction",
+    "notification",
+    "Search",
+    "comment",
+    'corsheaders',
+
+
+>>>>>>> sothea
 ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 
 # custom user model
@@ -61,6 +74,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = "backend.urls"
