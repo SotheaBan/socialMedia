@@ -48,7 +48,13 @@ pyc
 backend/user/migrations/__pycache__
 backend/user/__pycache__
 backend/Post/__pycache__
+__pycache__/
+*.pyc
+
+
 db.sqlite3
+
+
 
 media/
 
