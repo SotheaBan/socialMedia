@@ -8,5 +8,6 @@ class Post(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
     likes = models.IntegerField()
+    
 
    

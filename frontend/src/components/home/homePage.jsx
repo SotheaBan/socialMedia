@@ -6,22 +6,23 @@ import Body  from './components/body'
 import Suggestion  from './components/suggestion_friend';
 function Home() {
   return (
-    <div className='bg-white overflow-hidden'>
-        <Nav/>
-        <div className='grid grid-cols-5'>
-            <div className='bg-[#490057] h-screen'>
-              <Sidebar/>
+      <div className="bg-[#EEEEEE] overflow-hidden">
+        <div className='mr-5'>
+          <Nav />
+          <div className="grid grid-cols-7 h-screen"> 
+            <div className="bg-[#490057] h-full">
+              <Sidebar />
             </div>
-            <div className='col-span-3'> 
-              <Body/>
+            <div className="col-span-5 overflow-y-auto overflow-hidden h-full w-fit rounded-xl"> 
+              <Body />
             </div>
-            <div className='p-2'>
-            <Suggestion/>
+            <div className=" h-full col-span-1 w-fit  overflow-hidden scrollbar-hidden">
+              <Suggestion />
             </div>
+          </div>
         </div>
-
-        
-    </div>
+          
+  </div>
   );
 }
 
