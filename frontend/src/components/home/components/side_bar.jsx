@@ -1,4 +1,5 @@
 import React from 'react';
+
 function SideBar() {
   return (
     <div className='p-7 text-white w-screen '>

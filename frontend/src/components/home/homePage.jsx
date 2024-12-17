@@ -4,6 +4,7 @@ import Nav from './components/navbar'
 import Sidebar from './components/side_bar'
 import Body  from './components/body'
 import Suggestion  from './components/suggestion_friend';
+import PostPage from '../Post/postPage';
 function Home() {
   return (
       <div className="bg-[#EEEEEE] overflow-hidden">
@@ -21,6 +22,7 @@ function Home() {
             </div>
           </div>
         </div>
+ 
           
   </div>
   );
