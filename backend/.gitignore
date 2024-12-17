@@ -45,7 +45,7 @@ backend/db.sqlite3
 
 __pycache__
 pyc
-
+migration/__pycache__
 
 db.sqlite3
 
