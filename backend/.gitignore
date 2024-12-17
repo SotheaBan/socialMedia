@@ -49,4 +49,6 @@ backend/media/
 
 db.sqlite3
 
-.js
+
+media/
+
