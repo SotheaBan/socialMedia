@@ -306,12 +306,11 @@ class FollowUnfollowView(APIView):
 
         # Prepare response data with user details
         user_data = UserListSerializer(user_to_follow).data
-        user_data["is_following"] = True
+        # user_data["is_following"] = True
 
         return Response(
             {
                 "status": "success",
-                "code": "status.HTTP_200_OK",
                 "message": f"You are now following {user_to_follow.username}.",
                 "data": {
                     "user": user_data,

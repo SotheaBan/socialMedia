@@ -45,6 +45,9 @@ INSTALLED_APPS = [
     "Post",
     "Reaction",
     "notification",
+    "Search",
+    "comment",
+    # "corsheaders",
 ]
 
 REST_FRAMEWORK = {
@@ -64,6 +67,9 @@ SIMPLE_JWT = {
 }
 
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+
 # custom user model
 AUTH_USER_MODEL = "user.User"
 
@@ -75,6 +81,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "backend.urls"
