@@ -13,3 +13,48 @@ build/
 # Ignore IDE files
 .vscode/
 .idea/
+
+# Django specific
+*.log                    # Log files
+*.pot                    # Translation files
+*.pyc                    # Python bytecode files
+*.pyo                    # Python optimized bytecode files
+__pycache__             # Python cache directories
+backend/db.sqlite3               
+
+# Django migrations
+*/migrations/*           # Ignore all migration files
+
+# Static and media files
+/static/                 # Ignore static files folder if not using a CDN or other static file handling
+/media/                  # Ignore media files folder if not using external storage
+
+# Environment and settings files
+.env                     # Ignore environment variables file (for sensitive data)
+*.env                    # Ignore all .env files
+
+# VSCode or other IDE specific files
+.vscode/                 # VSCode settings directory
+.idea/                   # JetBrains IDEs project files
+
+# MacOS system files
+.DS_Store                # MacOS Finder metadata files
+
+# Linux system files
+*~                       # Backup files created by text editors
+
+__pycache__
+pyc
+backend/user/migrations/__pycache__
+backend/user/__pycache__
+backend/Post/__pycache__
+__pycache__/
+*.pyc
+
+
+db.sqlite3
+
+
+
+media/
+
