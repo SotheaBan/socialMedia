@@ -4,29 +4,18 @@ import UserProfile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ ProtectedRoute";
+import './App.css';
+import './index.css';
+import Homepage from './components/home/homePage'
+import LoginPage from './components//authentication/login/loginPage'
+import Register from './components/authentication/login/components/Register';
 
 function App() {
   return (
-    <Router>
-      {" "}
-      <div className="App">
-        <h1>Navbar</h1>
-
-        <Routes>
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute>
-                <UserProfile />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-        </Routes>
-      </div>
-    </Router>
-  );
+    <>
+      <Register />
+    </>
+  )
 }
 
 export default App;
