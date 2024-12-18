@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "notification",
     "Search",
     "comment",
-    # "corsheaders",
+    "corsheaders",
 ]
 
 REST_FRAMEWORK = {

@@ -345,11 +345,19 @@ class FollowUnfollowView(APIView):
         # Unfollow the user
         user.unfollow(user_to_unfollow)
 
-        return Response(
+        # return Response(
+        #     {
+        #         "status": "success",
+        #         "code": status.HTTP_200_OK,
+        #         "message": f"You have unfollowed {user_to_unfollow.username}.",
+        #     },
+        #     status=status.HTTP_200_OK,
+        # )
+        return Resposnse(
             {
-                "status": "success",
-                "code": status.HTTP_200_OK,
-                "message": f"You have unfollowed {user_to_unfollow.username}.",
+                "status": "succcess",
+                "cide": status.HTTP_200_OK,
+                "message": f"you have unfollowed {user_to_unfollow.username}.",
             },
             status=status.HTTP_200_OK,
         )
