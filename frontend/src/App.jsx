@@ -2,6 +2,8 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import UserProfile from "./pages/Profile";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ProtectedRoute from "./components/ ProtectedRoute";
 
 function App() {
   return (
@@ -11,8 +13,16 @@ function App() {
         <h1>Navbar</h1>
 
         <Routes>
-          <Route path="/profile" element={<UserProfile />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
         </Routes>
       </div>
     </Router>
