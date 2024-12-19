@@ -9,8 +9,8 @@ const UserProfile = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
-
   const navigate = useNavigate();
+
   const accessToken = localStorage.getItem("accessToken");
   const decodedToken = accessToken ? jwtDecode(accessToken) : null;
   const currentUserId = decodedToken ? decodedToken.user_id : null;
@@ -18,7 +18,6 @@ const UserProfile = () => {
   // Fetch the user profile data
   useEffect(() => {
     const fetchUserProfile = async () => {
-      console.log("Fetching user profile for userId:", userId); // Debug log
       if (!accessToken) {
         setError("No access token found. Please log in again.");
         setLoading(false);
@@ -35,8 +34,6 @@ const UserProfile = () => {
           }
         );
 
-        console.log("Fetched user data:", response.data); // Debug log
-
         if (response.data && response.data.data) {
           const fetchedUser = response.data.data;
           setUser(fetchedUser);
@@ -45,14 +42,17 @@ const UserProfile = () => {
           const isFollowingUser =
             Array.isArray(fetchedUser.followers) &&
             fetchedUser.followers.includes(currentUserId);
-          console.log("Is current user following:", isFollowingUser); // Debug log
           setIsFollowing(isFollowingUser);
+
+          // Debugging the fetched user and follow status
+          console.log("Fetched User:", fetchedUser);
+          console.log("Is following:", isFollowingUser);
         } else {
           setError("User not found.");
         }
       } catch (err) {
         setError("Something went wrong. Please try again.");
-        console.log("Error fetching user profile:", err); // Debug log
+        console.error("Error fetching user profile:", err);
       } finally {
         setLoading(false);
       }
@@ -61,28 +61,20 @@ const UserProfile = () => {
     fetchUserProfile();
   }, [userId, accessToken, currentUserId]);
 
-  // Handle the follow/unfollow toggle
   const handleFollowToggle = async () => {
-    console.log("Follow/unfollow button clicked"); // Debug log
     if (!accessToken) {
       setError("No access token found. Please log in again.");
       return;
     }
 
     const url = `http://127.0.0.1:8000/api/users/${userId}/follow/`;
-
-    // Set method dynamically: use POST for following, PUT for unfollowing
     const method = isFollowing ? "PUT" : "POST";
-    console.log("Making API call to:", url, "with method:", method); // Debug log
-
-    // Optimistically update the button state (toggle it immediately)
-    setIsFollowing((prevState) => {
-      console.log("Optimistically updating isFollowing:", !prevState); // Debug log
-      return !prevState;
-    });
 
     try {
-      // Make the follow/unfollow API request
+      // Optimistically update the button state before making the API call
+      setIsFollowing((prevState) => !prevState);
+
+      // Make the API request (either POST for follow or PUT for unfollow)
       const response = await axios({
         method,
         url,
@@ -91,74 +83,54 @@ const UserProfile = () => {
         },
       });
 
-      console.log("Response after follow/unfollow action:", response.data); // Debug log
-
       if (response.data.status === "success") {
-        // Check if the user is already following and handle accordingly
-        if (response.data.message === "You are already following test5.") {
-          console.log("User is already following. No need to toggle state."); // Debug log
-          // Do not toggle the state, show a success message or handle differently
-        } else {
-          // After a successful follow/unfollow action, update user data
-          const updatedResponse = await axios.get(
-            `http://127.0.0.1:8000/api/users/${userId}`,
-            {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-              },
-            }
-          );
+        // Directly update the follower and following counts based on the response
+        setUser((prevUser) => ({
+          ...prevUser,
+          followers_count: response.data.data.followers_count,
+          following_count: response.data.data.following_count,
+        }));
 
-          console.log(
-            "Updated user data after follow/unfollow:",
-            updatedResponse.data
-          ); // Debug log
-
-          if (updatedResponse.data && updatedResponse.data.data) {
-            const updatedUser = updatedResponse.data.data;
-            setUser(updatedUser);
-
-            // Check if the current user is following the fetched user
-            const isFollowingUser =
-              Array.isArray(updatedUser.followers) &&
-              updatedUser.followers.includes(currentUserId);
-            console.log(
-              "Is current user following after API update:",
-              isFollowingUser
-            ); // Debug log
-            setIsFollowing(isFollowingUser);
-          }
-        }
+        // Toggle the follow status
+        setIsFollowing(!isFollowing);
       } else {
-        setError(
-          response.data.message || "Something went wrong. Please try again."
-        );
-        console.log("API call failed. Reverting button state"); // Debug log
-        // Revert the button state if necessary (fallback)
-        setIsFollowing((prevState) => !prevState);
+        setError(response.data.message || "Something went wrong.");
+        setIsFollowing(isFollowing); // Revert UI changes on error
       }
     } catch (err) {
-      // In case of an error, revert the optimistic UI update and show the error
+      console.error("Error during follow/unfollow request:", err);
+      setIsFollowing(isFollowing); // Revert UI changes on error
       setError("Something went wrong. Please try again.");
-      console.log("Error during follow/unfollow request:", err); // Debug log
-      setIsFollowing((prevState) => !prevState);
     }
   };
 
   // Navigate to the edit profile page
   const handleEditProfile = () => {
-    console.log("Navigating to edit profile for userId:", userId); // Debug log
     navigate(`/edit-profile/${userId}`);
   };
 
   // Loading state
   if (loading) {
+    console.log("Loading profile...");
     return <p className="text-center py-4 text-gray-600">Loading profile...</p>;
   }
 
   // Error state
   if (error) {
+    console.error("Error:", error);
     return <p className="text-center py-4 text-red-600">{error}</p>;
+  }
+
+  // Debugging the values of user and currentUserId before rendering the profile
+  console.log("User Profile Data:", user);
+  console.log("Current User ID:", currentUserId);
+  console.log("Profile User ID:", user?.id);
+
+  // Ensure we have user data and currentUserId available for comparison
+  if (!user || !currentUserId) {
+    return (
+      <p className="text-center py-4 text-gray-600">Profile not available.</p>
+    );
   }
 
   return (
@@ -183,25 +155,29 @@ const UserProfile = () => {
               <h2 className="text-3xl font-semibold">
                 {user?.username || "Unnamed User"}
               </h2>
-              {user && currentUserId && currentUserId !== user.id && (
-                <button
-                  onClick={handleFollowToggle}
-                  className={`${
-                    isFollowing ? "bg-red-500" : "bg-blue-500"
-                  } mt-4 md:mt-0 px-4 py-2 text-white font-semibold rounded-full`}
-                >
-                  {isFollowing ? "Unfollow" : "Follow"}
-                </button>
-              )}
 
-              {currentUserId && user && currentUserId === user.id && (
-                <button
-                  onClick={handleEditProfile}
-                  className="mt-4 md:mt-0 bg-indigo-600 px-4 py-2 text-white font-semibold rounded-full"
-                >
-                  Edit Profile
-                </button>
-              )}
+              {/* Debugging the condition for showing buttons */}
+              {currentUserId === user.id
+                ? (console.log("Showing Edit Profile button"),
+                  (
+                    <button
+                      onClick={handleEditProfile}
+                      className="mt-4 md:mt-0 bg-indigo-600 px-4 py-2 text-white font-semibold rounded-full"
+                    >
+                      Edit Profile
+                    </button>
+                  ))
+                : (console.log("Showing Follow button"),
+                  (
+                    <button
+                      onClick={handleFollowToggle}
+                      className={`${
+                        isFollowing ? "bg-red-500" : "bg-blue-500"
+                      } mt-4 md:mt-0 px-4 py-2 text-white font-semibold rounded-full`}
+                    >
+                      {isFollowing ? "Unfollow" : "Follow"}
+                    </button>
+                  ))}
             </div>
 
             <div className="flex justify-between text-lg text-gray-700 mb-4">

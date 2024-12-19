@@ -60,8 +60,38 @@ const EditProfile = () => {
     fetchUserProfile();
   }, [userId, accessToken]);
 
+  // Handle file selection (profile picture)
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const fileSizeLimit = 5 * 1024 * 1024; // 5MB
+
+      // Check if file is an image
+      if (!file.type.startsWith("image/")) {
+        alert("Please upload a valid image.");
+        return;
+      }
+
+      // Check file size
+      if (file.size > fileSizeLimit) {
+        alert("File size exceeds the 5MB limit. Please upload a smaller file.");
+        return;
+      }
+
+      setProfilePic(file);
+      setProfilePicPreview(URL.createObjectURL(file)); // Preview the image
+    }
+  };
+
   // Handle saving the updated profile
   const handleSave = async () => {
+    console.log("Submitting form data...");
+    console.log("Username:", username);
+    console.log("Email:", email);
+    console.log("Bio:", bio);
+    console.log("Profile Picture:", profilePic);
+    console.log("Profile Picture Preview:", profilePicPreview);
+
     if (!accessToken) {
       setError("No access token found. Please log in again.");
       return;
@@ -83,12 +113,18 @@ const EditProfile = () => {
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "multipart/form-data", // Ensure this header is set for file uploads
           },
         }
       );
 
       if (response.data.status === "success") {
-        navigate(`/profile/${userId}`); // Navigate back to the user's profile page
+        console.log("Profile updated successfully.");
+        navigate(`/profile/${userId}`);
+      } else {
+        setError(
+          response.data.message || "Something went wrong. Please try again."
+        );
       }
     } catch (err) {
       console.error("Error updating profile:", err);
@@ -190,10 +226,7 @@ const EditProfile = () => {
               id="profilePic"
               type="file"
               accept="image/*"
-              onChange={(e) => {
-                setProfilePic(e.target.files[0]);
-                setProfilePicPreview(URL.createObjectURL(e.target.files[0])); // Set preview image
-              }}
+              onChange={handleFileChange}
               className="border border-gray-300 p-2 w-full rounded-md"
             />
           </div>
