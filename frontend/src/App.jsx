@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import UserList from "./pages/UserList";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -14,10 +15,18 @@ function App() {
 
         <Routes>
           <Route
-            path="/profile/:userId" // This is the route where user profiles are displayed
+            path="/profile/:userId"
             element={
               <ProtectedRoute>
                 <UserProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-profile/:userId"
+            element={
+              <ProtectedRoute>
+                <EditProfile />{" "}
               </ProtectedRoute>
             }
           />
