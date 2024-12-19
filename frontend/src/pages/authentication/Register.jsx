@@ -1,14 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
+    username: "",
+    email: "",
+    password: "",
   });
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -23,37 +26,38 @@ const Register = () => {
 
     // Basic validation
     if (!formData.username || !formData.email || !formData.password) {
-      setError('All fields are required');
+      setError("All fields are required");
       return;
     }
 
     // Create FormData object
     const formPayload = new FormData();
-    formPayload.append('username', formData.username);
-    formPayload.append('email', formData.email);
-    formPayload.append('password', formData.password);
+    formPayload.append("username", formData.username);
+    formPayload.append("email", formData.email);
+    formPayload.append("password", formData.password);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/register/', {
-        method: 'POST',
+      const response = await fetch("http://127.0.0.1:8000/api/register/", {
+        method: "POST",
         body: formPayload,
       });
 
       const result = await response.json();
       if (!response.ok) {
-        setError(result.message || 'Something went wrong');
+        setError(result.message || "Something went wrong");
         return;
       }
 
       setSuccess(true);
-      alert('Registration successful!');
+      alert("Registration successful!");
       setFormData({
-        username: '',
-        email: '',
-        password: '',
+        username: "",
+        email: "",
+        password: "",
       });
+      navigate("/user-profile");
     } catch (err) {
-      setError('Unable to process the request');
+      setError("Unable to process the request");
     }
   };
 
@@ -143,9 +147,9 @@ const Register = () => {
                 Sign Up
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Already have an account?{' '}
+                Already have an account?{" "}
                 <a
-                  href="#"
+                  href="/login"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Login here
