@@ -4,27 +4,21 @@ import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const UserProfile = () => {
-  const { userId } = useParams(); // Get the userId from the URL
+  const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isFollowing, setIsFollowing] = useState(false);
 
   const navigate = useNavigate();
-
-  // Get the access token from localStorage
   const accessToken = localStorage.getItem("accessToken");
-
-  // Decode the JWT token to get current user info
   const decodedToken = accessToken ? jwtDecode(accessToken) : null;
-  const currentUserId = decodedToken ? decodedToken.user_id : null; // Assuming 'user_id' is part of the token payload
+  const currentUserId = decodedToken ? decodedToken.user_id : null;
 
-  console.log("Access Token from localStorage:", accessToken);
-  console.log("Current User ID from Token:", currentUserId);
-
-  // Fetch the user profile data and check if the current user is following them
+  // Fetch the user profile data
   useEffect(() => {
     const fetchUserProfile = async () => {
+      console.log("Fetching user profile for userId:", userId); // Debug log
       if (!accessToken) {
         setError("No access token found. Please log in again.");
         setLoading(false);
@@ -32,7 +26,6 @@ const UserProfile = () => {
       }
 
       try {
-        // Fetch the user profile by userId
         const response = await axios.get(
           `http://127.0.0.1:8000/api/users/${userId}`,
           {
@@ -42,83 +35,132 @@ const UserProfile = () => {
           }
         );
 
-        // Debugging: Log the API response to check if we get the correct data
-        console.log("User Profile Response:", response.data);
+        console.log("Fetched user data:", response.data); // Debug log
 
         if (response.data && response.data.data) {
           const fetchedUser = response.data.data;
-
-          // Safely check if 'followers' is an array before using 'includes'
           setUser(fetchedUser);
-          setIsFollowing(
+
+          // Check if the current user is following the fetched user
+          const isFollowingUser =
             Array.isArray(fetchedUser.followers) &&
-              fetchedUser.followers.includes(currentUserId)
-          );
+            fetchedUser.followers.includes(currentUserId);
+          console.log("Is current user following:", isFollowingUser); // Debug log
+          setIsFollowing(isFollowingUser);
         } else {
           setError("User not found.");
         }
       } catch (err) {
-        console.error("Error fetching user profile:", err);
         setError("Something went wrong. Please try again.");
+        console.log("Error fetching user profile:", err); // Debug log
       } finally {
         setLoading(false);
       }
     };
 
     fetchUserProfile();
-  }, [userId, accessToken, currentUserId]); // Added accessToken and currentUserId to the dependency array
+  }, [userId, accessToken, currentUserId]);
 
-  // Handle follow/unfollow button click
+  // Handle the follow/unfollow toggle
   const handleFollowToggle = async () => {
+    console.log("Follow/unfollow button clicked"); // Debug log
     if (!accessToken) {
       setError("No access token found. Please log in again.");
       return;
     }
 
+    const url = `http://127.0.0.1:8000/api/users/${userId}/follow/`;
+
+    // Set method dynamically: use POST for following, PUT for unfollowing
+    const method = isFollowing ? "PUT" : "POST";
+    console.log("Making API call to:", url, "with method:", method); // Debug log
+
+    // Optimistically update the button state (toggle it immediately)
+    setIsFollowing((prevState) => {
+      console.log("Optimistically updating isFollowing:", !prevState); // Debug log
+      return !prevState;
+    });
+
     try {
-      const url = isFollowing
-        ? `http://127.0.0.1:8000/api/users/${userId}/unfollow`
-        : `http://127.0.0.1:8000/api/users/${userId}/follow`;
-
-      const response = await axios.post(
+      // Make the follow/unfollow API request
+      const response = await axios({
+        method,
         url,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-      // Debugging: Log the API response for follow/unfollow
-      console.log("Follow/Unfollow Response:", response.data);
+      console.log("Response after follow/unfollow action:", response.data); // Debug log
 
-      // Toggle follow status based on response
       if (response.data.status === "success") {
-        setIsFollowing(!isFollowing); // Toggle the follow status
+        // Check if the user is already following and handle accordingly
+        if (response.data.message === "You are already following test5.") {
+          console.log("User is already following. No need to toggle state."); // Debug log
+          // Do not toggle the state, show a success message or handle differently
+        } else {
+          // After a successful follow/unfollow action, update user data
+          const updatedResponse = await axios.get(
+            `http://127.0.0.1:8000/api/users/${userId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            }
+          );
+
+          console.log(
+            "Updated user data after follow/unfollow:",
+            updatedResponse.data
+          ); // Debug log
+
+          if (updatedResponse.data && updatedResponse.data.data) {
+            const updatedUser = updatedResponse.data.data;
+            setUser(updatedUser);
+
+            // Check if the current user is following the fetched user
+            const isFollowingUser =
+              Array.isArray(updatedUser.followers) &&
+              updatedUser.followers.includes(currentUserId);
+            console.log(
+              "Is current user following after API update:",
+              isFollowingUser
+            ); // Debug log
+            setIsFollowing(isFollowingUser);
+          }
+        }
+      } else {
+        setError(
+          response.data.message || "Something went wrong. Please try again."
+        );
+        console.log("API call failed. Reverting button state"); // Debug log
+        // Revert the button state if necessary (fallback)
+        setIsFollowing((prevState) => !prevState);
       }
     } catch (err) {
-      console.error("Error updating follow status:", err);
+      // In case of an error, revert the optimistic UI update and show the error
       setError("Something went wrong. Please try again.");
+      console.log("Error during follow/unfollow request:", err); // Debug log
+      setIsFollowing((prevState) => !prevState);
     }
   };
 
-  // Handle "Edit Profile" button click
+  // Navigate to the edit profile page
   const handleEditProfile = () => {
-    // Navigate to the edit profile page using the userId
-    navigate(`/edit-profile/${userId}`); // This will route to the frontend edit page
+    console.log("Navigating to edit profile for userId:", userId); // Debug log
+    navigate(`/edit-profile/${userId}`);
   };
 
-  // Show loading or error message if needed
+  // Loading state
   if (loading) {
     return <p className="text-center py-4 text-gray-600">Loading profile...</p>;
   }
 
+  // Error state
   if (error) {
     return <p className="text-center py-4 text-red-600">{error}</p>;
   }
 
-  // Render user profile page
   return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="container mx-auto px-6 md:px-12">
@@ -179,14 +221,6 @@ const UserProfile = () => {
             </div>
           </div>
         </header>
-
-        {/* Mobile View - Profile Info */}
-        <div className="block md:hidden text-center">
-          <h3 className="text-xl font-semibold mb-2">
-            {user?.full_name || "Full Name"}
-          </h3>
-          <p>{user?.bio || "Bio information not available"}</p>
-        </div>
       </div>
     </div>
   );
