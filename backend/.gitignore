@@ -50,3 +50,13 @@ backend/media/
 db.sqlite3
 
 .js
+
+# Ignore compiled Python files
+*.pyc
+__pycache__/
+
+# Ignore SQLite database
+*.sqlite3
+
+# Ignore node_modules
+node_modules/

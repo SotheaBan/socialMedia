@@ -14,12 +14,12 @@ function Home() {
             <div className="bg-[#490057] h-full">
               <Sidebar />
             </div>
-            <div className="col-span-4 overflow-y-auto  h-full w-fit rounded-xl ml-7"> 
+            {/* <div className="col-span-4 overflow-y-auto  h-full w-fit rounded-xl ml-7"> 
               <Body />
             </div>
             <div className=" h-full col-span-2  overflow-hidden scrollbar-hidden w-64">
               <Suggestion />
-            </div>
+            </div> */}
           </div>
         </div>
  
