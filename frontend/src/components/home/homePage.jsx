@@ -5,6 +5,7 @@ import Body from './components/body';
 import Suggestion from './components/suggestion_friend';
 
 function Home() {
+
     const [searchResults, setSearchResults] = useState(null); // Track search results
 
     return (
@@ -21,6 +22,7 @@ function Home() {
                     <Suggestion />
                 </div>
             </div>
+
         </div>
     );
 }

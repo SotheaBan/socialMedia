@@ -21,3 +21,15 @@ media/
 .vscode/
 .idea/
 *.swp
+
+.json
+
+# Ignore compiled Python files
+*.pyc
+__pycache__/
+
+# Ignore SQLite database
+*.sqlite3
+
+# Ignore node_modules
+node_modules/
