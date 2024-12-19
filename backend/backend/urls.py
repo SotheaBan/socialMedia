@@ -23,12 +23,12 @@ from user.views import CustomTokenObtainPairView
  
 
 urlpatterns = [
-#     path('admin/', admin.site.urls),
-#     path('api/', include('Post.urls')),
-#     path('api/notification', include('notification.urls')),
-#     path('api/', include('Search.urls')),
-#     path('api/', include('comment.urls'))
-# ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('admin/', admin.site.urls),
+    path('api/', include('Post.urls')),
+    path('api/notification', include('notification.urls')),
+    path('api/', include('Search.urls')),
+    path('api/', include('comment.urls')),
+
     path("admin/", admin.site.urls),
     path("api/token/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     # path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
