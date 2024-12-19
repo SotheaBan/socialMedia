@@ -29,29 +29,27 @@ const Body = () => {
 
   return (
     <div className=''>
-      <div className='p-4 rounded-xl text-[#A303A0] flex flex-col bg-white mx-10 '>
+      <div className='p-4 md:p-4 rounded-xl text-[#A303A0] flex flex-col bg-white '>
 
                 <div className='flex gap-4 justify-center text-xl '>
-
-                  <button type="button" class="px-4 py-2 text-lg font-medium text-gray-900 bg-white  rounded-s-lg hover:bg-gray-100 hover:text-blue-700  focus:ring-blue-700 focus:text-blue-700  dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray">
-                    Following
-                  </button>
-                  <button type="button" class="px-4 py-2 text-lg font-medium text-gray-900 bg-white  border-gray-200 hover:bg-gray-100 hover:text-blue-700  focus:ring-blue-700 focus:text-blue-700 0 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray">
-                    Follower
-                  </button>
-                  <button type="button" class="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-e-lg hover:bg-gray-100 hover:text-blue-700   focus:text-blue-700  dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray ">
-                    Post
-                  </button>
-
+                      <button type="button" class="px-4 py-2 text-lg font-medium text-gray-900 bg-white  rounded-s-lg hover:bg-gray-100 hover:text-blue-700  focus:ring-blue-700 focus:text-blue-700  dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray">
+                        Following
+                      </button>
+                      <button type="button" class="px-4 py-2 text-lg font-medium text-gray-900 bg-white  border-gray-200 hover:bg-gray-100 hover:text-blue-700  focus:ring-blue-700 focus:text-blue-700 0 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray">
+                        Follower
+                      </button>
+                      <button type="button" class="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-e-lg hover:bg-gray-100 hover:text-blue-700   focus:text-blue-700  dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray ">
+                        Post
+                      </button>
                 </div>
           <hr className='w-full mt-7' />
-          <ul className="flex flex-col items-center ">
+          <ul className="flex flex-col items-center overflow-y-auto max-h-screen  overflow-clip">
                 {[...posts].reverse().map((post) => (
                   <li key={post.id} className="mt-5 w-full max-w-4xl"> 
                     <div className="flex items-center gap-4 pt-6 ">
 
                       <img
-                        className="w-20 h-20 rounded-xl "
+                        className="w-10 h-10 rounded-xl md:w-20 md:h-20"
                         src={post.profile_picture || "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"}
                         alt={post.author || "Author"}
                       />
@@ -68,13 +66,13 @@ const Body = () => {
 
                     <div className="pt-5 p-5 flex justify-center items-center">
 
-                      {post.image && (
-                        <img
-                          src={post.image}
-                          alt="Post Image"
-                          className="w-2/3 object-cover"  
-                        />
-                      )}
+                        {post.image && (
+                          <img
+                            src={post.image}
+                            alt="Post Image"
+                            className="w-full object-cover"  
+                          />
+                        )}
                     </div>
 
                     <div className="ml-6 flex gap-4 justify-start">
