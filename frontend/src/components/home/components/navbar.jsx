@@ -1,4 +1,5 @@
 import React from 'react';
+import SearchBar from './searchbar';
 
 function nav() {
   return (
@@ -12,15 +13,7 @@ function nav() {
                 <div className='col-span-6'>
                     <div className='grid grid-cols-5 gap-4 items-center text-center'>
                 
-                            <div className='col-span-4 p-5 '>
-                                    <div class=" w-full  flex  px-4 py-3 rounded-md border-2  overflow-hidden  font-[sans-serif] gap-2 bg-white">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-[#490057]">
-                                            <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
-                                            <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clipRule="evenodd" />
-                                        </svg>
-                                        <input type="email" placeholder="Search Something..." class="w-full outline-none bg-transparent text-gray-600 text-sm m-1" />
-                                    </div>
-                            </div>
+                            <SearchBar />
                             
                             <div className='col-span-1'>
                             
