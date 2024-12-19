@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +9,6 @@ const Register = () => {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -149,7 +146,7 @@ const Register = () => {
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
                 <a
-                  href="/login"
+                  href="#"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Login here
