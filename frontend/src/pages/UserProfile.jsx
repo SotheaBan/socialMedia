@@ -49,7 +49,16 @@ const UserProfile = () => {
             : [];
           const isFollowingUser = followers.includes(currentUserId);
 
-          setIsFollowing(isFollowingUser);
+          // Retrieve the persisted state from localStorage
+          const persistedIsFollowing = JSON.parse(
+            localStorage.getItem(`isFollowing_${userId}`)
+          );
+
+          setIsFollowing(
+            persistedIsFollowing !== null
+              ? persistedIsFollowing
+              : isFollowingUser
+          );
         } else {
           setError("User not found.");
         }
@@ -91,6 +100,7 @@ const UserProfile = () => {
           following_count: response.data.data.following_count,
         }));
 
+        // Persist the new following state in localStorage
         localStorage.setItem(
           `isFollowing_${userId}`,
           JSON.stringify(!isFollowing)
