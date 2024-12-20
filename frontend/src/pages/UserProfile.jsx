@@ -8,14 +8,15 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false); // Initialize state
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersList, setFollowersList] = useState([]);
+  const [followingList, setFollowingList] = useState([]);
   const navigate = useNavigate();
 
   const accessToken = localStorage.getItem("accessToken");
   const decodedToken = accessToken ? jwtDecode(accessToken) : null;
   const currentUserId = decodedToken ? decodedToken.user_id : null;
 
-  // Fetch the user profile data
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!accessToken) {
@@ -38,27 +39,17 @@ const UserProfile = () => {
           const fetchedUser = response.data.data;
           setUser(fetchedUser);
 
-          // Ensure `followers` is an array before calling `.includes`
+          // Set followers and following from the response
+          setFollowersList(response.data.followers);
+          setFollowingList(response.data.following);
+
+          // Check if the current user is following the fetched user
           const followers = Array.isArray(fetchedUser.followers)
             ? fetchedUser.followers
             : [];
-
-          // Check if the current user is following the fetched user
           const isFollowingUser = followers.includes(currentUserId);
 
-          // Retrieve the follow status from localStorage and update state
-          const storedFollowStatus = localStorage.getItem(
-            `isFollowing_${userId}`
-          );
-          if (storedFollowStatus !== null) {
-            setIsFollowing(JSON.parse(storedFollowStatus)); // Parse as boolean
-          } else {
-            setIsFollowing(isFollowingUser); // Fallback to fetched status if not in localStorage
-          }
-
-          // Debugging the fetched user and follow status
-          console.log("Fetched User:", fetchedUser);
-          console.log("Is following:", isFollowingUser);
+          setIsFollowing(isFollowingUser);
         } else {
           setError("User not found.");
         }
@@ -83,10 +74,8 @@ const UserProfile = () => {
     const method = isFollowing ? "PUT" : "POST";
 
     try {
-      // Optimistically update the button state before making the API call
       setIsFollowing((prevState) => !prevState);
 
-      // Make the API request (either POST for follow or PUT for unfollow)
       const response = await axios({
         method,
         url,
@@ -96,59 +85,48 @@ const UserProfile = () => {
       });
 
       if (response.data.status === "success") {
-        // Directly update the follower and following counts based on the response
         setUser((prevUser) => ({
           ...prevUser,
           followers_count: response.data.data.followers_count,
           following_count: response.data.data.following_count,
         }));
 
-        // Store the follow status in localStorage for persistence
         localStorage.setItem(
           `isFollowing_${userId}`,
           JSON.stringify(!isFollowing)
         );
 
-        // Toggle the follow status
         setIsFollowing(!isFollowing);
       } else {
         setError(response.data.message || "Something went wrong.");
-        setIsFollowing(isFollowing); // Revert UI changes on error
+        setIsFollowing(isFollowing);
       }
     } catch (err) {
       console.error("Error during follow/unfollow request:", err);
-      setIsFollowing(isFollowing); // Revert UI changes on error
+      setIsFollowing(isFollowing);
       setError("Something went wrong. Please try again.");
     }
   };
 
-  // Navigate to the edit profile page
   const handleEditProfile = () => {
     navigate(`/edit-profile/${userId}`);
   };
 
-  // Loading state
+  // Handle navigation when clicking on followers or following count
+  const handleNavigateToFollowers = () => {
+    navigate(`/profile/${userId}/followers`);
+  };
+
+  const handleNavigateToFollowing = () => {
+    navigate(`/profile/${userId}/following`);
+  };
+
   if (loading) {
-    console.log("Loading profile...");
     return <p className="text-center py-4 text-gray-600">Loading profile...</p>;
   }
 
-  // Error state
   if (error) {
-    console.error("Error:", error);
     return <p className="text-center py-4 text-red-600">{error}</p>;
-  }
-
-  // Debugging the values of user and currentUserId before rendering the profile
-  console.log("User Profile Data:", user);
-  console.log("Current User ID:", currentUserId);
-  console.log("Profile User ID:", user?.id);
-
-  // Ensure we have user data and currentUserId available for comparison
-  if (!user || !currentUserId) {
-    return (
-      <p className="text-center py-4 text-gray-600">Profile not available.</p>
-    );
   }
 
   return (
@@ -174,7 +152,6 @@ const UserProfile = () => {
                 {user?.username || "Unnamed User"}
               </h2>
 
-              {/* Show the Follow/Unfollow button */}
               {currentUserId === user.id ? (
                 <button
                   onClick={handleEditProfile}
@@ -199,10 +176,20 @@ const UserProfile = () => {
                 <strong>{user?.posts_count || 0}</strong> posts
               </div>
               <div>
-                <strong>{user?.followers_count || 0}</strong> followers
+                <strong
+                  onClick={handleNavigateToFollowers}
+                  className="cursor-pointer"
+                >
+                  {user?.followers_count || 0} followers
+                </strong>{" "}
               </div>
               <div>
-                <strong>{user?.following_count || 0}</strong> following
+                <strong
+                  onClick={handleNavigateToFollowing}
+                  className="cursor-pointer"
+                >
+                  {user?.following_count || 0} following
+                </strong>{" "}
               </div>
             </div>
 
