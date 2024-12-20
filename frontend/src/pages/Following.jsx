@@ -23,12 +23,12 @@ const Following = () => {
           `http://127.0.0.1:8000/api/users/${userId}/`, // Endpoint to fetch user data
           {
             headers: {
-              Authorization: `Bearer ${accessToken}`, // Include token in Authorization header
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
 
-        setFollowingList(response.data.following || []); // Assuming the response has a `following` field
+        setFollowingList(response.data.following || []);
       } catch (err) {
         setError("Failed to load following. Please try again.");
         console.error("Error fetching following:", err);

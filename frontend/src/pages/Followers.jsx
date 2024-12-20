@@ -3,9 +3,7 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const Followers = () => {
-  const { userId } = useParams(); // Extract the userId from the URL
-
-  // Log userId to ensure it's being passed correctly
+  const { userId } = useParams();
   console.log("userId from useParams:", userId);
 
   const [followersList, setFollowersList] = useState([]);
@@ -30,7 +28,7 @@ const Followers = () => {
 
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/users/${userId}/`, // Correct endpoint for followers
+          `http://127.0.0.1:8000/api/users/${userId}/`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -40,7 +38,7 @@ const Followers = () => {
 
         console.log("User Profile Data: ", response.data);
 
-        setFollowersList(response.data.followers || []); // Assuming followers are an array of usernames
+        setFollowersList(response.data.followers || []); //
       } catch (err) {
         setError("Failed to load followers. Please try again.");
       } finally {

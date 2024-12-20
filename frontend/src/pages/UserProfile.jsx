@@ -39,7 +39,6 @@ const UserProfile = () => {
           const fetchedUser = response.data.data;
           setUser(fetchedUser);
 
-          // Set followers and following from the response
           setFollowersList(response.data.followers);
           setFollowingList(response.data.following);
 

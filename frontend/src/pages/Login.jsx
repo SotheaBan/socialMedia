@@ -26,10 +26,8 @@ function LoginPage() {
         password,
       });
 
-      // Log the response to verify the data structure
       console.log("Login response data:", response.data);
 
-      // Ensure response.data has access_token and refresh_token
       if (
         response.data &&
         response.data.data.access_token &&
@@ -43,7 +41,6 @@ function LoginPage() {
           response.data.data.access_token
         );
 
-        // Redirect to the profile page after successful login
         navigate("/profile");
       } else {
         setError("No access token or refresh token received.");
@@ -52,7 +49,7 @@ function LoginPage() {
       console.error("Error logging in:", error);
       setError("Invalid credentials. Please try again.");
     } finally {
-      setLoading(false); // Stop loading state
+      setLoading(false);
     }
   };
 
@@ -81,7 +78,7 @@ function LoginPage() {
       }
     } catch (error) {
       console.error("Error refreshing token:", error);
-      // Handle token refresh failure, e.g., redirect to login page
+
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       navigate("/login");
