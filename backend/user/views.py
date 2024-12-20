@@ -337,6 +337,7 @@ class FollowUnfollowView(APIView):
             return Response(
                 {
                     "status": "error",
+                    # "code": status.HTTP_400_BAD_REQUEST,
                     "message": f"You are not following {user_to_unfollow.username}.",
                 },
                 status=status.HTTP_400_BAD_REQUEST,
@@ -345,15 +346,7 @@ class FollowUnfollowView(APIView):
         # Unfollow the user
         user.unfollow(user_to_unfollow)
 
-        # return Response(
-        #     {
-        #         "status": "success",
-        #         "code": status.HTTP_200_OK,
-        #         "message": f"You have unfollowed {user_to_unfollow.username}.",
-        #     },
-        #     status=status.HTTP_200_OK,
-        # )
-        return Resposnse(
+        return Response(
             {
                 "status": "succcess",
                 "cide": status.HTTP_200_OK,

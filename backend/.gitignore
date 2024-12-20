@@ -19,7 +19,7 @@ build/
 *.pot                    # Translation files
 *.pyc                    # Python bytecode files
 *.pyo                    # Python optimized bytecode files
-__pycache__/             # Python cache directories
+__pycache__             # Python cache directories
 backend/db.sqlite3               
 
 # Django migrations
@@ -43,6 +43,20 @@ backend/db.sqlite3
 # Linux system files
 *~                       # Backup files created by text editors
 
+__pycache__
+pyc
+backend/user/migrations/__pycache__
+backend/user/__pycache__
+backend/Post/__pycache__
+__pycache__/
+*.pyc
+
+
+db.sqlite3
+
+
+
+media/
 
 *.sqlite3
 backend/media/
