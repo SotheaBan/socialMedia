@@ -1,21 +1,16 @@
 import React from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import UserProfile from "./pages/Profile";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ProtectedRoute from "./components/ ProtectedRoute";
+import { BrowserRouter as Router } from 'react-router-dom'; // Keep only this import
+import AppRoutes from './Routes'; // Import your routing setup
 import './index.css';
 
-import { BrowserRouter as Router } from 'react-router-dom';
-import AppRoutes from './Routes'; // Import your routing setup
 function App() {
   return (
     <>
       <Router>
-          <AppRoutes />
+        <AppRoutes />
       </Router>
     </>
-  )
+  );
 }
 
 export default App;
