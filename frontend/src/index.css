@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+/* Prevent scrolling for the entire page */
+html, body {
+    height: 100%;
+    overflow: hidden; /* Prevent scrolling */
+    margin: 0;
+  }
+  
+  /* Hide scrollbar but keep functionality */
+  ::-webkit-scrollbar {
+    display: none; /* Hides the scrollbar */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: transparent; /* Optionally, you can make the thumb transparent */
+  }
+  
