@@ -25,7 +25,7 @@ from user.views import CustomTokenObtainPairView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('Post.urls')),
-    path('api/notification', include('notification.urls')),
+    path('api/notification/', include('notification.urls')),
     path('api/', include('Search.urls')),
     path('api/', include('comment.urls')),
 
