@@ -157,7 +157,7 @@ const UserProfile = () => {
 
           <div className="md:w-2/3 ml-0 md:ml-6">
             <div className="flex flex-col md:flex-row md:items-center md:space-x-6 mb-6">
-              <h2 className="text-3xl font-semibold">
+              <h2 className="text-3xl font-semibold text-center md:text-left">
                 {user?.username || "Unnamed User"}
               </h2>
 
@@ -180,11 +180,11 @@ const UserProfile = () => {
               )}
             </div>
 
-            <div className="flex justify-between text-lg text-gray-700 mb-4">
-              <div>
+            <div className="flex flex-col sm:flex-row justify-between text-lg text-gray-700 mb-4">
+              <div className="mb-4 sm:mb-0">
                 <strong>{user?.posts_count || 0}</strong> posts
               </div>
-              <div>
+              <div className="mb-4 sm:mb-0">
                 <strong
                   onClick={handleNavigateToFollowers}
                   className="cursor-pointer"
