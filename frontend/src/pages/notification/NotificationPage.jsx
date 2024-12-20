@@ -1,5 +1,7 @@
 // notificationPage.jsx
 import React, { useState } from 'react';
+import Navbar from '../home/components/navbar';
+import Sidebar from '../home/components/side_bar';
 import {
   NotificationHeader,
   NotificationItem,
@@ -17,22 +19,7 @@ const NotificationPage = () => {
       is_read: false,
       profile_picture: 'https://via.placeholder.com/40',
     },
-    {
-      id: 2,
-      message: 'commented on your photo',
-      notification_type: 'comment',
-      created_at: '2024-12-19T18:25:30.371132Z',
-      is_read: true,
-      profile_picture: 'https://via.placeholder.com/40',
-    },
-    {
-      id: 3,
-      message: 'sent you a message',
-      notification_type: 'message',
-      created_at: '2024-12-18T14:10:15.371132Z',
-      is_read: false,
-      profile_picture: 'https://via.placeholder.com/40',
-    },
+    // ... other notifications
   ]);
 
   const [filterUnread, setFilterUnread] = useState(false);
@@ -48,22 +35,32 @@ const NotificationPage = () => {
     : notifications;
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
-      <NotificationHeader filterUnread={filterUnread} setFilterUnread={setFilterUnread} />
-      {filteredNotifications.length > 0 ? (
-        filteredNotifications.map((notification) => (
-          <NotificationItem key={notification.id} notification={notification} />
-        ))
-      ) : (
-        <EmptyState />
-      )}
-      <button
-        onClick={markAllAsRead}
-        className="mt-6 px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-blue-600"
-      >
-        Mark All as Read
-      </button>
-      <NotificationFooter totalNotifications={notifications.length} />
+    <div className="bg-[#ffffff] md">
+        <Navbar />
+      <div className="grid grid-cols-7 h-screen overflow-hidden">
+        <div className="md:bg-[#490057] h-full overflow-hidden">
+          <Sidebar />
+        </div>
+        <div className="col-span-7 md:col-span-5 overflow-hidden">
+          <div className="p-6 bg-white-100 min-h-screen">
+            <NotificationHeader filterUnread={filterUnread} setFilterUnread={setFilterUnread} />
+            {filteredNotifications.length > 0 ? (
+              filteredNotifications.map((notification) => (
+                <NotificationItem key={notification.id} notification={notification} />
+              ))
+            ) : (
+              <EmptyState />
+            )}
+            <button
+              onClick={markAllAsRead}
+              className="mt-6 px-6 py-2 bg-blue-500 text-white text-sm font-semibold rounded-lg shadow hover:bg-blue-600"
+            >
+              Mark All as Read
+            </button>
+            <NotificationFooter totalNotifications={notifications.length} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
