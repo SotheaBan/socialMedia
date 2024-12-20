@@ -64,7 +64,7 @@ const Body = () => {
   }
 
   return (
-      <div className="p-4 md:p-4 rounded-xl text-[#A303A0] flex flex-col bg-white ">
+      <div className="p-4 md:p-4 rounded-xl text-[#A303A0] flex flex-col bg-white h-screen">
         <div className="flex gap-4 justify-center text-xl ">
           <button type="button" className="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray">
             Following

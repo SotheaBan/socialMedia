@@ -6,9 +6,11 @@ from rest_framework import filters
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import AllowAny
 # Create your views here.
 
-class ListCreateView(ListCreateAPIView): 
+class ListCreateView(ListAPIView): 
+    permission_classes = [AllowAny]
     queryset = Post.objects.all() 
     serializer_class = ListSerializer
 

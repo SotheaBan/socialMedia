@@ -38,10 +38,11 @@ function LoginPage() {
         localStorage.setItem("refreshToken", response.data.data.refresh_token);
         console.log(
           "Access token stored in localStorage:",
-          response.data.data.access_token
+          response.data.data.access_token,
+         
         );
 
-        navigate("/profile");
+        navigate("/home");
       } else {
         setError("No access token or refresh token received.");
       }

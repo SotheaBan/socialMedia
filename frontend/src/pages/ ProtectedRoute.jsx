@@ -6,10 +6,7 @@ const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem("accessToken");
 
   // If the user is not authenticated, redirect to the login page
-  if (!isAuthenticated) {
-    return <Navigate to="/login" />;
-  }
-
+  
   // If authenticated, render the protected component (children)
   return children;
 };
