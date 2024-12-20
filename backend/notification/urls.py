@@ -4,5 +4,5 @@ from .views import NotificationListView, MarkNotificationAsReadView, CreateNotif
 urlpatterns = [
     path('', NotificationListView.as_view(), name='noti-list'),
     path('<int:id>/read/', MarkNotificationAsReadView.as_view(), name='mark-noti-read'),
-    path('create/', CreateNotificationView.as_view, name='create-notification')
+    # path('create/', CreateNotificationView.as_view, name='create-notification')
 ]
