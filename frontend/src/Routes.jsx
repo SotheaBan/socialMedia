@@ -5,6 +5,7 @@ import Homepage from './pages/home/homePage'
 import PostPage from './pages/Post/postPage'
 import Login from './pages/authentication/Login'
 import Register from './pages/authentication/Register'
+import NotificationPage from './pages/notification/notificationPage';
 
 const AppRoutes = () => {
   return (
@@ -15,6 +16,7 @@ const AppRoutes = () => {
       <Route path="/post" element={<PostPage />} />
       <Route path='/login' element = {<Login/>}/>
       <Route path='/register' element = {<Register/>}/>
+      <Route path='/notification' element = {<NotificationPage/>}/>
       <Route path="*" element={<h1>404 - Page Not Found</h1>} />
     </Routes>
   );
