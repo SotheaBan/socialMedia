@@ -3,14 +3,24 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 
 const Followers = () => {
-  const { userId } = useParams();
+  const { userId } = useParams(); // Extract the userId from the URL
+
+  // Log userId to ensure it's being passed correctly
+  console.log("userId from useParams:", userId);
+
   const [followersList, setFollowersList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchFollowers = async () => {
-      const accessToken = localStorage.getItem("accessToken"); // Get the token from localStorage or another place
+      if (!userId) {
+        setError("User ID is missing.");
+        setLoading(false);
+        return;
+      }
+
+      const accessToken = localStorage.getItem("accessToken");
 
       if (!accessToken) {
         setError("You are not authorized. Please log in.");
@@ -20,14 +30,17 @@ const Followers = () => {
 
       try {
         const response = await axios.get(
-          `http://127.0.0.1:8000/api/users/${userId}/`,
+          `http://127.0.0.1:8000/api/users/${userId}/`, // Correct endpoint for followers
           {
             headers: {
-              Authorization: `Bearer ${accessToken}`, // Pass the token in the Authorization header
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
-        setFollowersList(response.data.followers); // Assuming the API returns an object with a "followers" property
+
+        console.log("User Profile Data: ", response.data);
+
+        setFollowersList(response.data.followers || []); // Assuming followers are an array of usernames
       } catch (err) {
         setError("Failed to load followers. Please try again.");
       } finally {
@@ -38,19 +51,28 @@ const Followers = () => {
     fetchFollowers();
   }, [userId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <p className="text-center text-gray-600">Loading...</p>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <div className="followers-page">
-      <h2>Followers</h2>
-      <ul>
+    <div className="max-w-4xl mx-auto p-6 bg-white shadow-xl rounded-lg mt-8">
+      <h2 className="text-4xl font-semibold text-center text-gray-900 mb-6">
+        Followers
+      </h2>
+      <ul className="space-y-5">
         {followersList.length > 0 ? (
           followersList.map((follower, index) => (
-            <li key={index}>{follower}</li>
+            <li
+              key={index}
+              className="flex items-center p-5 bg-gray-50 rounded-xl shadow-md hover:bg-blue-50 hover:shadow-xl transition duration-300 ease-in-out"
+            >
+              <span className="text-xl text-gray-800 font-medium">
+                {follower}
+              </span>
+            </li>
           ))
         ) : (
-          <p>No followers found.</p>
+          <p className="text-center text-gray-500">No followers found.</p>
         )}
       </ul>
     </div>
