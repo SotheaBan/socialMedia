@@ -8,7 +8,7 @@ const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false); // Initialize state
   const navigate = useNavigate();
 
   const accessToken = localStorage.getItem("accessToken");
@@ -38,11 +38,23 @@ const UserProfile = () => {
           const fetchedUser = response.data.data;
           setUser(fetchedUser);
 
+          // Ensure `followers` is an array before calling `.includes`
+          const followers = Array.isArray(fetchedUser.followers)
+            ? fetchedUser.followers
+            : [];
+
           // Check if the current user is following the fetched user
-          const isFollowingUser =
-            Array.isArray(fetchedUser.followers) &&
-            fetchedUser.followers.includes(currentUserId);
-          setIsFollowing(isFollowingUser);
+          const isFollowingUser = followers.includes(currentUserId);
+
+          // Retrieve the follow status from localStorage and update state
+          const storedFollowStatus = localStorage.getItem(
+            `isFollowing_${userId}`
+          );
+          if (storedFollowStatus !== null) {
+            setIsFollowing(JSON.parse(storedFollowStatus)); // Parse as boolean
+          } else {
+            setIsFollowing(isFollowingUser); // Fallback to fetched status if not in localStorage
+          }
 
           // Debugging the fetched user and follow status
           console.log("Fetched User:", fetchedUser);
@@ -90,6 +102,12 @@ const UserProfile = () => {
           followers_count: response.data.data.followers_count,
           following_count: response.data.data.following_count,
         }));
+
+        // Store the follow status in localStorage for persistence
+        localStorage.setItem(
+          `isFollowing_${userId}`,
+          JSON.stringify(!isFollowing)
+        );
 
         // Toggle the follow status
         setIsFollowing(!isFollowing);
@@ -156,28 +174,24 @@ const UserProfile = () => {
                 {user?.username || "Unnamed User"}
               </h2>
 
-              {/* Debugging the condition for showing buttons */}
-              {currentUserId === user.id
-                ? (console.log("Showing Edit Profile button"),
-                  (
-                    <button
-                      onClick={handleEditProfile}
-                      className="mt-4 md:mt-0 bg-indigo-600 px-4 py-2 text-white font-semibold rounded-full"
-                    >
-                      Edit Profile
-                    </button>
-                  ))
-                : (console.log("Showing Follow button"),
-                  (
-                    <button
-                      onClick={handleFollowToggle}
-                      className={`${
-                        isFollowing ? "bg-red-500" : "bg-blue-500"
-                      } mt-4 md:mt-0 px-4 py-2 text-white font-semibold rounded-full`}
-                    >
-                      {isFollowing ? "Unfollow" : "Follow"}
-                    </button>
-                  ))}
+              {/* Show the Follow/Unfollow button */}
+              {currentUserId === user.id ? (
+                <button
+                  onClick={handleEditProfile}
+                  className="mt-4 md:mt-0 bg-indigo-600 px-4 py-2 text-white font-semibold rounded-full"
+                >
+                  Edit Profile
+                </button>
+              ) : (
+                <button
+                  onClick={handleFollowToggle}
+                  className={`${
+                    isFollowing ? "bg-red-500" : "bg-blue-500"
+                  } mt-4 md:mt-0 px-4 py-2 text-white font-semibold rounded-full`}
+                >
+                  {isFollowing ? "Unfollow" : "Follow"}
+                </button>
+              )}
             </div>
 
             <div className="flex justify-between text-lg text-gray-700 mb-4">
