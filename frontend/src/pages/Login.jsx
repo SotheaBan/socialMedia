@@ -26,10 +26,8 @@ function LoginPage() {
         password,
       });
 
-      // Log the response to verify the data structure
       console.log("Login response data:", response.data);
 
-      // Ensure response.data has access_token and refresh_token
       if (
         response.data &&
         response.data.data.access_token &&
@@ -40,11 +38,11 @@ function LoginPage() {
         localStorage.setItem("refreshToken", response.data.data.refresh_token);
         console.log(
           "Access token stored in localStorage:",
-          response.data.data.access_token
+          response.data.data.access_token,
+         
         );
 
-        // Redirect to the profile page after successful login
-        navigate("/profile");
+        navigate("/home");
       } else {
         setError("No access token or refresh token received.");
       }
@@ -52,7 +50,7 @@ function LoginPage() {
       console.error("Error logging in:", error);
       setError("Invalid credentials. Please try again.");
     } finally {
-      setLoading(false); // Stop loading state
+      setLoading(false);
     }
   };
 
@@ -81,7 +79,7 @@ function LoginPage() {
       }
     } catch (error) {
       console.error("Error refreshing token:", error);
-      // Handle token refresh failure, e.g., redirect to login page
+
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
       navigate("/login");
@@ -109,9 +107,9 @@ function LoginPage() {
             />
             Social Media
           </a>
-          <div className="w-full shadow-xl bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="w-full shadow-xl bg-white rounded-lg dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 className="text-2xl font-bold leading-tight text-center text-blue-700 tracking-tight text-gray-900 md:text-2xl dark:text-white">
+              <h1 className="text-2xl font-bold leading-tight text-centertracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Log in
               </h1>
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">

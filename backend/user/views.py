@@ -67,23 +67,14 @@ class CustomTokenObtainPairView(APIView):
         exp_time = None
         try:
             access_token_obj = AccessToken(access_token)
-            exp_timestamp = access_token_obj.payload.get("exp")
-
-            # Calculate time remaining (in minutes)
-            now = timezone.now()
-            # Convert exp_timestamp to a datetime object and calculate remaining time
-            exp_time = datetime.utcfromtimestamp(exp_timestamp).replace(
-                tzinfo=timezone.utc
-            )
-            time_remaining = (exp_time - now).total_seconds() / 60.0  # in minutes
+            
         except TokenError:
             pass  # If there's an error in decoding the token, we just return None for exp_time
 
         custom_response_data = {
             "access_token": access_token,
             "refresh_token": str(refresh),
-            "token_expiration": exp_time,
-            "time_remaining_minutes": time_remaining,
+
             "id": user.id,
             "username": user.username,
             "email": user.email,
@@ -291,29 +282,28 @@ class FollowUnfollowView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Prevent following the same user twice
+        # If already following, return success
         if user_to_follow in user.following.all():
             return Response(
                 {
-                    "status": "error",
+                    "status": "success",
                     "message": f"You are already following {user_to_follow.username}.",
+                    "data": {
+                        "followers_count": user_to_follow.followers.count(),
+                        "following_count": user_to_follow.following.count(),
+                    },
                 },
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_200_OK,
             )
 
         # Follow the user
         user.follow(user_to_follow)
-
-        # Prepare response data with user details
-        user_data = UserListSerializer(user_to_follow).data
-        # user_data["is_following"] = True
 
         return Response(
             {
                 "status": "success",
                 "message": f"You are now following {user_to_follow.username}.",
                 "data": {
-                    "user": user_data,
                     "followers_count": user_to_follow.followers.count(),
                     "following_count": user_to_follow.following.count(),
                 },
@@ -321,7 +311,7 @@ class FollowUnfollowView(APIView):
             status=status.HTTP_200_OK,
         )
 
-    def delete(self, request, id=None):
+    def put(self, request, id=None):
         user_to_unfollow = get_object_or_404(User, id=id)
         user = request.user
 
@@ -332,15 +322,18 @@ class FollowUnfollowView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Prevent unfollowing a user you're not following
+        # If not following, return success
         if user_to_unfollow not in user.following.all():
             return Response(
                 {
-                    "status": "error",
-                    # "code": status.HTTP_400_BAD_REQUEST,
+                    "status": "success",
                     "message": f"You are not following {user_to_unfollow.username}.",
+                    "data": {
+                        "followers_count": user_to_unfollow.followers.count(),
+                        "following_count": user_to_unfollow.following.count(),
+                    },
                 },
-                status=status.HTTP_400_BAD_REQUEST,
+                status=status.HTTP_200_OK,
             )
 
         # Unfollow the user
@@ -348,9 +341,12 @@ class FollowUnfollowView(APIView):
 
         return Response(
             {
-                "status": "succcess",
-                "cide": status.HTTP_200_OK,
-                "message": f"you have unfollowed {user_to_unfollow.username}.",
+                "status": "success",
+                "message": f"You are now unfollowing {user_to_unfollow.username}.",
+                "data": {
+                    "followers_count": user_to_unfollow.followers.count(),
+                    "following_count": user_to_unfollow.following.count(),
+                },
             },
             status=status.HTTP_200_OK,
         )

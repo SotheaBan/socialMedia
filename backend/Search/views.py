@@ -5,9 +5,11 @@ from rest_framework import status
 from .serializer import UserSerializer, PostSerializer
 from user.models import User
 from Post.models import Post
+from rest_framework.permissions import AllowAny
 # Create your views here.
 
 class SearchView(APIView):
+    permission_classes = [AllowAny]
     def get(self, request):
         query = request.query_params.get("q", "")
         if not query:

@@ -15,7 +15,7 @@ function Home() {
                 <div className="md:bg-[#490057] h-full overflow-hidden">
                     <Sidebar />
                 </div>
-                <div className="col-span-7 md:col-span-5 overflow-hidden">
+                <div className="col-span-7 h-screen  md:col-span-5 overflow-y-scroll mb-28">
                     <Body />
                 </div>
             </div>

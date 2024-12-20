@@ -109,9 +109,9 @@ function LoginPage() {
             />
             Social Media
           </a>
-          <div className="w-full shadow-xl bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+          <div className="w-full  bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 className="text-2xl font-bold leading-tight text-center text-blue-700 tracking-tight text-gray-900 md:text-2xl dark:text-white">
+              <h1 className="text-2xl font-bold leading-tight text-center tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Log in
               </h1>
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
