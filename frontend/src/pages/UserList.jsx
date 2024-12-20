@@ -90,7 +90,7 @@ const UserList = () => {
             >
               <div className="flex items-center justify-center mb-4">
                 <img
-                  className="w-24 h-24 rounded-full object-cover border-4 border-indigo-600"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-pink-600"
                   src={
                     user.profile_picture
                       ? `http://127.0.0.1:8000${user.profile_picture}`
