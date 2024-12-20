@@ -3,7 +3,7 @@ from .models import Post
 from rest_framework.generics import ListCreateAPIView , RetrieveUpdateDestroyAPIView,ListAPIView,RetrieveAPIView,CreateAPIView
 from .serializer import PostSerializer,UserPostSerializer, ListSerializer
 from rest_framework import filters
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view,permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -28,6 +28,7 @@ class SearchUser(ListAPIView):
     queryset = Post.objects.all() 
         
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def Createpost(request):
         serializer = PostSerializer(data = request.data) 
         if serializer.is_valid(): 

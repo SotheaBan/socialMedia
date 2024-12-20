@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 function PostPage() {
   const [title, setTitle] = useState(''); // Store title
   const [file, setFile] = useState(null); // Store the file
-  const [author,setAuthor] = useState(1)
+  const [author,setAuthor] = useState("a8c8e4ec-d604-45de-9b74-d6d626c9c231")
 
   // Handle title change
   const handleTitleChange = (e) => {
@@ -44,7 +44,8 @@ function PostPage() {
         alert('It Posted');
         window.location.href = '/'; 
       } else {
-        alert('Failed to create post!');
+        const errordata = await response.json()
+        console.error("faild to create", errordata)
       }
     } catch (error) {
       console.error('Error posting data:', error);
