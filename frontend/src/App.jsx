@@ -1,3 +1,4 @@
+
 import React from "react";
 import { BrowserRouter as Router } from 'react-router-dom'; // Keep only this import
 import AppRoutes from './Routes'; // Import your routing setup
@@ -14,3 +15,4 @@ function App() {
 }
 
 export default App;
+

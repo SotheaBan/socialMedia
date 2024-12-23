@@ -59,21 +59,25 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=90),
-    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=7200),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=7),
     "SLIDING_TOKEN_LIFETIME": timedelta(days=30),
-    "SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER": timedelta(days=1),
+    "SLIDING_TOKEN_REFRESH_LIFETIME_LATE_USER": timedelta(days=7),
     "SLIDING_TOKEN_LIFETIME_LATE_USER": timedelta(days=30),
 }
 
 
 CORS_ALLOW_ALL_ORIGINS = True
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Your frontend URL
+    "http://127.0.0.1:5173",  # Localhost alternative
+]
 
 # custom user model
 AUTH_USER_MODEL = "user.User"
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -82,6 +86,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+]
+
+CORS_ALLOW_HEADERS = [
+    "content-type",
+    "authorization",
+    # Add other headers as needed
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -115,6 +126,12 @@ DATABASES = {
     }
 }
 
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",
+# ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
