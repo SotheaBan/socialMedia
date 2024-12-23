@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { Link } from 'react-router-dom';
 const Body = () => {
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState({}); // Store comments for each post by post ID
