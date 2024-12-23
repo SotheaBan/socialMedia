@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live llll</title>
+    <style>
+        .connected { color: green; }
+        .disconnected { color: red; }
+        .notification-item { 
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 4px solid #3498db;
+            background: #f8f9fa;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const notificationList = document.getElementById('notification-list');
+            const connectionStatus = document.getElementById('connection-status');
+            const testButton = document.getElementById('send-test');
+            const wsScheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+            const socket = new WebSocket(`${wsScheme}${window.location.host}/ws/notification/`);
+            
+            socket.onopen = function(event) {
+                console.log('WebSocket connected:', event);
+                connectionStatus.textContent = 'Connected';
+                connectionStatus.className = 'connected';
+            };
+            
+            socket.onmessage = function(event) {
+                console.log('Received message:', event.data);
+                const data = JSON.parse(event.data);
+                if (data.type === 'notification') {
+                    const newNotification = document.createElement('li');
+                    newNotification.className = 'notification-item';
+                    newNotification.textContent = data.message;
+                    notificationList.prepend(newNotification);
+                    console.log('Added notification:', data.message);
+                }
+            };
+
+            socket.onerror = function(error) {
+                console.error('WebSocket error:', error);
+                connectionStatus.textContent = 'Error';
+                connectionStatus.className = 'disconnected';
+            };
+
+            socket.onclose = function(event) {
+                console.log('WebSocket closed:', event);
+                connectionStatus.textContent = 'Disconnected';
+                connectionStatus.className = 'disconnected';
+            };
+
+            function getCsrfToken() {
+                const name = 'csrftoken';
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Test notification function
+            testButton.onclick = async function() {
+                try {
+                    const response = await fetch('/api/notification/create/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken(), // Add CSRF token
+                        },
+                        credentials: 'same-origin', // Required for CSRF token to be sent
+                        body: JSON.stringify({
+                            user_id: 2,
+                            message: 'Test notification ' + new Date().toLocaleTimeString(),
+                            notification_type: 'test'
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('Notification sent:', data);
+                } catch (error) {
+                    console.error('Error sending notification:', error);
+                    alert('Failed to send notification: ' + error.message);
+                }
+            };
+        });
+    </script>
+</head>
+<body>
+    <h1>Live Notifications</h1>
+    <div>WebSocket Status: <span id="connection-status">Connecting...</span></div>
+    <button id="send-test">Send Test Notification</button>
+    <ul id="notification-list">
+        <!-- Notifications will appear here -->
+    </ul>
+</body>
+</html>
