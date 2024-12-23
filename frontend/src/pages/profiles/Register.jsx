@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,8 +9,6 @@ const Register = () => {
 
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-
-  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { id, value } = e.target;
@@ -55,7 +52,7 @@ const Register = () => {
         email: "",
         password: "",
       });
-      navigate("/user-profile");
+      navigate("/home");
     } catch (err) {
       setError("Unable to process the request");
     }
@@ -77,7 +74,7 @@ const Register = () => {
         </a>
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl text-center  font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            <h1 className="text-xl text-centerfont-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Create an account
             </h1>
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
@@ -149,7 +146,7 @@ const Register = () => {
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
                 <a
-                  href="/login"
+                  href="#"
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
                 >
                   Login here

@@ -33,3 +33,7 @@ __pycache__/
 
 # Ignore node_modules
 node_modules/
+
+*.pyc
+__pycache__/
+*.sqlite3

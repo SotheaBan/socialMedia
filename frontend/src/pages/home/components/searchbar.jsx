@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
+import { Link } from 'react-router-dom';
 function SearchBar({ setSearchResults }) {
     const [query, setQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [localResults, setLocalResults] = useState({ users: [], posts: [] });
 
-    const getImageUrl = (image) => {
-        if (!image) return null;
-        return image.startsWith('http') ? image : `http://127.0.0.1:8000${image}`;
+    const getImageUrl = (imagePath) => {
+        if (!imagePath) {
+            return "https://images.unsplash.com/photo-1502791451862-7bd8c1df43a7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=80";
+        }
+        return `http://127.0.0.1:8000${imagePath}`;
     };
 
 
@@ -61,20 +63,24 @@ function SearchBar({ setSearchResults }) {
                             <div className="p-4">
                                 <h3 className="text-sm font-semibold text-[#490057] mb-2">Users</h3>
                                 {localResults.users.map(user => (
-                                    <div key={user.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md">
-                                        <img 
-                                            src={user.profile_picture || "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"} 
-                                            alt={user.username}
-                                            className="w-8 h-8 rounded-full"
-                                        />
-                                        <div>
-                                            <p className="text-sm font-medium text-gray-900">{user.username}</p>
-                                            {user.bio && (
-                                                <p className="text-xs text-gray-500 truncate">{user.bio}</p>
-                                            )}
-                                        </div>
+                                <Link 
+                                    to={`/profile/${user.id}`} 
+                                    key={user.id}
+                                    className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md"
+                                >
+                                    <img 
+                                        src={getImageUrl(user.profile_picture)}
+                                        alt={user.username}
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+                                    <div>
+                                        <p className="text-sm font-medium text-gray-900">{user.username}</p>
+                                        {user.bio && (
+                                            <p className="text-xs text-gray-500 truncate">{user.bio}</p>
+                                        )}
                                     </div>
-                                ))}
+                                </Link>
+                            ))}
                             </div>
                         )}
 
