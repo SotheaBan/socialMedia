@@ -5,7 +5,10 @@ from rest_framework.response import Response
 from .models import Notification
 from .models import User
 from .serializer import NotificationSerializer
-
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 
 class NotificationListView(APIView):
     # permission_classes = [IsAuthenticated]  # Temporarily removed for testing
@@ -29,8 +32,9 @@ class MarkNotificationAsReadView(APIView):
         notification.save()
         return Response({"message": "Marked as Read"}, status=200)
     
-class CreateNotificationView(APIView):
 
+#this createnotificationview is only for testing purposes not for production
+class CreateNotificationView(APIView):
     def post(self, request):
         user_id = request.data.get('user_id')
         message = request.data.get('message')
@@ -48,7 +52,17 @@ class CreateNotificationView(APIView):
             message=message,
             notification_type=notification_type
         )
+
+        # Send real-time notification
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f'user_{user_id}_notifications',
+            {
+                'type': 'notification_message',
+                'message': message,
+                'notification_type': notification_type
+            }
+        )
         
         serializer = NotificationSerializer(notification)
         return Response(serializer.data, status=201)
-

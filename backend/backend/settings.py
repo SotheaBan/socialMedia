@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     "comment",
     'corsheaders',
 
-
+    'channels',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
@@ -85,8 +85,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "backend.wsgi.application"
+# WSGI_APPLICATION = "backend.wsgi.application"
 
+ASGI_APPLICATION = "backend.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -147,3 +148,13 @@ MEDIA_URL = '/media/'
 
 # Absolute path to the directory where files will be stored
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 8001)],
+        },
+    },
+}
