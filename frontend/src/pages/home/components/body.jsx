@@ -71,6 +71,32 @@ const Body = () => {
     return <div>{error}</div>;
   }
 
+  const timeAgo = (timestamp) => {
+    const now = new Date();
+    const postTime = new Date(timestamp);
+
+    const diffInMs = now - postTime;
+  
+
+    const diffInSecs = Math.floor(diffInMs / 1000);
+    const diffInMins = Math.floor(diffInSecs / 60);
+    const diffInHours = Math.floor(diffInMins / 60);
+    const diffInDays = Math.floor(diffInHours / 24);
+  
+
+    if (diffInDays > 0) {
+      return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+    } else if (diffInHours > 0) {
+      return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    } else if (diffInMins > 0) {
+      return `${diffInMins} minute${diffInMins > 1 ? 's' : ''} ago`;
+    } else {
+      return `${diffInSecs} second${diffInSecs > 1 ? 's' : ''} ago`;
+    }
+  };
+  
+  
+
   return (
     <div className="p-4 md:p-4 rounded-xl text-[#A303A0] flex flex-col bg-white h-screen">
       <div className="flex gap-4 justify-center text-xl ">
@@ -97,7 +123,7 @@ const Body = () => {
               <div className="font-medium text-gray-700">
                 <div className="text-xl text-[#490057] font-bold">{post.author}</div>
                 <div className="text-xs text-[#A303A0]">
-                  {new Date(post.created_at).toLocaleString()}
+                  {timeAgo(post.created_at)}
                 </div>
               </div>
             </div>

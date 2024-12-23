@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 
 function PostPage() {
+
   const [title, setTitle] = useState(''); // Store title
   const [file, setFile] = useState(null); // Store the file
   const [author,setAuthor] = useState("a8c8e4ec-d604-45de-9b74-d6d626c9c231")
@@ -54,8 +55,8 @@ function PostPage() {
   };
 
   return (
-    <div className="flex justify-center mt-10">
-      <div className="flex flex-col items-center justify-center w-min min-h-[300px] space-y-4">
+    <div className="flex justify-center md:mt-10 ">
+      <div className="flex flex-col items-center justify-center  min-h-[300px] space-y-4">
         <input
           type="text"
           id="title"
@@ -69,7 +70,7 @@ function PostPage() {
           htmlFor="dropzone-file"
           className="flex flex-col items-center justify-center w-full min-h-[200px] sm:min-h-[250px] border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50  dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
         >
-          <div className="flex flex-col items-center justify-center pt-5 pb-6">
+          <div className="flex flex-col items-center justify-center pt-5 pb-6 " >
             <svg
               className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
               aria-hidden="true"
@@ -102,12 +103,20 @@ function PostPage() {
 
         <button
           type="button"
-          className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+          className="text-white bg-[#490057] hover:bg-gradient-to-bl font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
           onClick={handleSubmit}
         >
           <a href="/home">Post</a>
         </button>
       </div>
+      <div className=''>
+         <a href="/home">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10 text-white ml-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+         </a>
+      </div>
+       
     </div>
   );
 }
