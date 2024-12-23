@@ -1,5 +1,7 @@
 // src/Routes.jsx
-import React from "react";
+import React from 'react';
+import LinkUp from './pages/chat/LinkUp';
+import TextPage from './pages/chat/TextPage';
 import { Routes, Route, Navigate } from "react-router-dom";
 import Homepage from "./pages/home/homePage";
 import PostPage from "./pages/Post/postPage";
@@ -24,6 +26,8 @@ const AppRoutes = () => {
       <Route path="/edit-profile/:userId" element={<EditProfile />} />
       <Route path="/profile/:userId/followers" element={<Followers />} />
       <Route path="/profile/:userId/following" element={<Following />} />
+      <Route path="/text" element={< TextPage/>} />
+      <Route path="/linkUp" element={<LinkUp/>}  />
       <Route path="*" element={<h1>404 - Page Not Found</h1>} />
     </Routes>
   );
