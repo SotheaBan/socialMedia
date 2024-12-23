@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -17,10 +17,20 @@ function LoginPage() {
     };
   };
 
+  // Check if the user is already logged in and redirect them to home if they are
+  useEffect(() => {
+    const { accessToken } = getTokens();
+    if (accessToken) {
+      console.log("User is already logged in, redirecting to /home");
+      navigate("/home");
+    }
+  }, [navigate]);
+
   // Function to handle login
   const loginUser = async (email, password) => {
     setLoading(true); // Start loading state
     try {
+      console.log("Sending login request...");
       const response = await axios.post("http://127.0.0.1:8000/api/token/", {
         email,
         password,
@@ -38,12 +48,13 @@ function LoginPage() {
         localStorage.setItem("refreshToken", response.data.data.refresh_token);
         console.log(
           "Access token stored in localStorage:",
-          response.data.data.access_token,
-         
+          response.data.data.access_token
         );
 
+        // Redirect to home after successful login
         navigate("/home");
       } else {
+        console.error("No access token or refresh token received.");
         setError("No access token or refresh token received.");
       }
     } catch (error) {
@@ -51,38 +62,6 @@ function LoginPage() {
       setError("Invalid credentials. Please try again.");
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Function to refresh the access token
-  const refreshToken = async () => {
-    try {
-      const { refreshToken } = getTokens();
-      if (!refreshToken) {
-        throw new Error("No refresh token available");
-      }
-
-      const response = await axios.post("http://127.0.0.1:8000/api/refresh/", {
-        refresh_token: refreshToken,
-      });
-
-      // Store the new access token in localStorage
-      if (response.data && response.data.data.access_token) {
-        localStorage.setItem("accessToken", response.data.data.access_token);
-        console.log(
-          "New access token stored:",
-          response.data.data.access_token
-        );
-        return response.data.data.access_token; // Return new access token
-      } else {
-        throw new Error("Failed to refresh access token");
-      }
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      navigate("/login");
     }
   };
 
@@ -109,7 +88,7 @@ function LoginPage() {
           </a>
           <div className="w-full shadow-xl bg-white rounded-lg dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 className="text-2xl font-bold leading-tight text-centertracking-tight text-gray-900 md:text-2xl dark:text-white">
+              <h1 className="text-2xl font-bold leading-tight text-center tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Log in
               </h1>
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">

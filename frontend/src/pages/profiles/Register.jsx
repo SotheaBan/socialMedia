@@ -52,7 +52,7 @@ const Register = () => {
         email: "",
         password: "",
       });
-      navigate("/user-profile");
+      navigate("/home");
     } catch (err) {
       setError("Unable to process the request");
     }
