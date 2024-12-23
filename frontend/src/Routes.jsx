@@ -11,13 +11,14 @@ import TextPage from './pages/chat/TextPage';
 const AppRoutes = () => {
   return (
     <Routes>
-      <Route path="/text" element={< TextPage/>} />
-      <Route path="/linkUp" element={<LinkUp/>}  />
+      
       <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/home" element={<Homepage />} />
       <Route path="/post" element={<PostPage />} />
       <Route path='/login' element = {<Login/>}/>
       <Route path='/register' element = {<Register/>}/>
+      <Route path="/text" element={< TextPage/>} />
+      <Route path="/linkUp" element={<LinkUp/>}  />
       <Route path="*" element={<h1>404 - Page Not Found</h1>} />
     </Routes>
   );

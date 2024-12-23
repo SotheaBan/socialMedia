@@ -1,10 +1,7 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
 import React from 'react'
-
 const TextPage = () => {
   return (
-    
     <div className="min-w-screen max-auto bg-slate-700">
         <div className="w-full h-16 flex justify-between  items-center bg-gray-800">
             <div className="left  w-[10%] text-white text-xl "><span className="ml-4"><i class="fa-solid fa-arrow-left"></i>
@@ -32,7 +29,7 @@ const TextPage = () => {
         <li><a href="#" class="text-white mr-3 text-2xl hover:text-blue-500"><i class="fa-solid fa-video"></i></a></li>
         <li><a href="#" class="text-white text-2xl hover:text-blue-500"><i class="fa-solid fa-circle-exclamation"></i></a></li>
     </ul>
-</div>
+    </div>
         </div>
         <div className="w-full h-96 bg-white"></div>
         <div className="w-full flex h-16">
@@ -50,18 +47,14 @@ const TextPage = () => {
             type="text"
             placeholder="Search..."
             class="w-full mt-3  h-10 pl-4 pr-12 text-gray-700 bg-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+            />
           <button
             id="search-button"
             class="absolute  right-3 transform -translate-y-1/2 text-gray-500"
             aria-label="Search"
           >
-            
           </button>
-
-
-
-            </div>
+          </div>
             <div className=" w-[10%] h-full  ">
                 <ul class="flex mt-5 mx-6 justify-between items-center">
                     <li><a href="" class="text-white text-xl"><i class="fa-solid fa-thumbs-up"></i></a></li>
