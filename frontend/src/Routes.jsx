@@ -20,6 +20,7 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/users" element={<UserList />} />
       <Route path="/home" element={<Homepage />} />
 
       {/* Protected Routes */}
