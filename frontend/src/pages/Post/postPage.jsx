@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
-
+import React, { useState } from "react";
 
 function PostPage() {
-  const [title, setTitle] = useState(''); // Store title
+  const [title, setTitle] = useState(""); // Store title
   const [file, setFile] = useState(null); // Store the file
-  const [author,setAuthor] = useState(1)
+  const [author, setAuthor] = useState("6020f784-2916-4731-b3aa-c05d14d9de67");
 
   // Handle title change
   const handleTitleChange = (e) => {
@@ -21,34 +20,34 @@ function PostPage() {
     e.preventDefault();
 
     if (!title) {
-      alert('Caption are required!');
+      alert("Caption are required!");
       return;
     }
-    if (!file){
-        alert('Image are required!');
+    if (!file) {
+      alert("Image are required!");
       return;
     }
 
     const formData = new FormData();
-    formData.append('content', title);
-    formData.append('image', file);
-    formData.append('author',author)
+    formData.append("content", title);
+    formData.append("image", file);
+    formData.append("author", author);
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/post/', {
-        method: 'POST',
+      const response = await fetch("http://127.0.0.1:8000/api/post/", {
+        method: "POST",
         body: formData,
       });
 
       if (response.ok) {
-        alert('It Posted');
-        window.location.href = '/'; 
+        alert("It Posted");
+        window.location.href = "/";
       } else {
-        alert('Failed to create post!');
+        alert("Failed to create post!");
       }
     } catch (error) {
-      console.error('Error posting data:', error);
-      alert('An error occurred!');
+      console.error("Error posting data:", error);
+      alert("An error occurred!");
     }
   };
 
@@ -85,7 +84,8 @@ function PostPage() {
               />
             </svg>
             <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              <span className="font-semibold">Click to upload</span> or drag and drop
+              <span className="font-semibold">Click to upload</span> or drag and
+              drop
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
               SVG, PNG, JPG or GIF (MAX. 800x400px)
