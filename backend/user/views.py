@@ -67,14 +67,23 @@ class CustomTokenObtainPairView(APIView):
         exp_time = None
         try:
             access_token_obj = AccessToken(access_token)
-            
+            exp_timestamp = access_token_obj.payload.get("exp")
+
+            # Calculate time remaining (in minutes)
+            now = timezone.now()
+            # Convert exp_timestamp to a datetime object and calculate remaining time
+            exp_time = datetime.utcfromtimestamp(exp_timestamp).replace(
+                tzinfo=timezone.utc
+            )
+            time_remaining = (exp_time - now).total_seconds() / 60.0  # in minutes
         except TokenError:
             pass  # If there's an error in decoding the token, we just return None for exp_time
 
         custom_response_data = {
             "access_token": access_token,
             "refresh_token": str(refresh),
-
+            "token_expiration": exp_time,
+            "time_remaining_minutes": time_remaining,
             "id": user.id,
             "username": user.username,
             "email": user.email,

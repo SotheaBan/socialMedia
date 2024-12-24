@@ -42,3 +42,26 @@ def Createpost(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def like_post(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+        user = request.user
+
+        # Check if the user already liked the post
+        if user in post.liked_by.all():
+            post.liked_by.remove(user)  # Unfollow (remove like)
+            post.likes -= 1  # Decrement like count
+        else:
+            post.liked_by.add(user)  # Add like
+            post.likes += 1  # Increment like count
+
+        post.save()  # Save updated post
+
+        return Response({"likes": post.likes}, status=status.HTTP_200_OK)
+
+    except Post.DoesNotExist:
+        return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)
