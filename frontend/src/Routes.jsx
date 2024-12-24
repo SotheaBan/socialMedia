@@ -13,6 +13,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import LinkUp from './pages/chat/LinkUp';
 import TextPage from './pages/chat/TextPage';
 
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -24,6 +25,7 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/users" element={<UserList />} />
       <Route path="/home" element={<Homepage />} />
+    
 
       {/* Protected Routes */}
       <Route
