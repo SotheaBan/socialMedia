@@ -1,6 +1,14 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const Posted = () => {
+  const [images,setImages] = useState([])
+  useEffect(() => {
+    // Fetch the images from localStorage if they exist
+    const storedImages = localStorage.getItem("images");
+    if (storedImages) {
+      setImages(JSON.parse(storedImages));
+    }
+  }, []);
 
   return (
     <div>
@@ -49,26 +57,17 @@ const Posted = () => {
      
  
 
-<div class="grid grid-cols-2 mt-4 md:grid-cols-3 gap-4">
-    <div>
-        <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg" alt=""/>
-    </div>
-    <div>
-        <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg" alt=""/>
-    </div>
-    <div>
-        <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-2.jpg" alt=""/>
-    </div>
-    <div>
-        <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-3.jpg" alt=""/>
-    </div>
-    <div>
-        <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-4.jpg" alt=""/>
-    
-</div>
-
-
-</div>
+      <div className="grid grid-cols-2 mt-4 md:grid-cols-3 gap-4">
+        {images.length === 0 ? (
+          <p>No posts yet.</p> // If there are no images, show a message
+        ) : (
+          images.map((imageUrl, index) => (
+            <div key={index}>
+              <img className="h-auto max-w-full rounded-lg" src={imageUrl} alt="Post" />
+            </div>
+          ))
+        )}
+      </div>
 </div>
   )
 }

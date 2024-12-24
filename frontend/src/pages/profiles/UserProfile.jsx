@@ -11,7 +11,12 @@ const UserProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersList, setFollowersList] = useState([]);
   const [followingList, setFollowingList] = useState([]);
+
+  const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
+
+
+  
 
   const accessToken = localStorage.getItem("accessToken");
   const decodedToken = accessToken ? jwtDecode(accessToken) : null;
@@ -38,17 +43,7 @@ const UserProfile = () => {
         console.log(response.data)
 
 
-        const postsResponse = await axios.get(
-          `http://127.0.0.1:8000/api/post/`, // Make sure this endpoint returns the posts of the user
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        console.log(postsResponse.data)
-
+        
         if (response.data && response.data.data) {
           const fetchedUser = response.data.data;
           setUser(fetchedUser);
@@ -255,28 +250,21 @@ const UserProfile = () => {
               </div>
       </div>
      
-      <hr className="border-black mt-4"/>
+      <hr className="border-black mt-6"/>
 
-<div className="grid grid-cols-2 mt-4 md:grid-cols-3 gap-4">
-    <div>
-        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg" alt=""/>
-    </div>
-    <div>
-        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg" alt=""/>
-    </div>
-    <div>
-        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-2.jpg" alt=""/>
-    </div>
-    <div>
-        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-3.jpg" alt=""/>
-    </div>
-    <div>
-        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-4.jpg" alt=""/>
-    
-</div>
-
-
-</div>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {posts.map((post) => (
+            post.image && (
+              <div key={post.id}>
+                <img
+                  className="h-auto max-w-full rounded-lg"
+                  src={`http://127.0.0.1:8000/api/post/${image}`}
+                  alt={post.title || "Post Image"}
+                />
+              </div>
+            )
+          ))}
+        </div>
 </div>
     </div>
   );
