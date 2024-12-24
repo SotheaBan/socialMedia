@@ -35,6 +35,20 @@ const UserProfile = () => {
           }
         );
 
+        console.log(response.data)
+
+
+        const postsResponse = await axios.get(
+          `http://127.0.0.1:8000/api/post/`, // Make sure this endpoint returns the posts of the user
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        console.log(postsResponse.data)
+
         if (response.data && response.data.data) {
           const fetchedUser = response.data.data;
           setUser(fetchedUser);
@@ -208,6 +222,62 @@ const UserProfile = () => {
           </div>
         </header>
       </div>
+      <div>
+      <div className="w-full">
+              <div className="grid grid-cols-2 ">
+                <div className=" col-span-1 h-24">
+                  <div className="w-full flex items-center justify-center mt-8">
+                        <a
+                          href=""
+                          className="relative group hover:bg-slate-100 shadow-lg hover:text-black transition p-4 rounded"
+                        >
+                          <i className="fa-solid fa-table-cells text-2xl lg:text-4xl"></i>
+                          <i
+                            className="fa-solid fa-minus  absolute top-full left-1/2 mt-2 -translate-x-1/2 text-black text-xl scale-0 opacity-0 transition group-hover:scale-100 group-hover:opacity-100"
+                          ></i>
+                        </a>
+
+                  </div>
+                </div>
+                <div className=" col-span-1 h-24">
+                  <div className="w-full flex items-center justify-center mt-8">
+                        <a
+                          href=""
+                          className="relative group hover:bg-slate-100 shadow-lg hover:text-black transition p-4 rounded"
+                        >
+                          <i className="fa-solid fa-user text-2xl lg:text-4xl"></i>
+                          <i
+                            className="fa-solid fa-minus  absolute top-full left-1/2 mt-2 -translate-x-1/2 text-black text-xl scale-0 opacity-0 transition group-hover:scale-100 group-hover:opacity-100"
+                          ></i>
+                        </a>
+                  </div>
+                </div>
+              </div>
+      </div>
+     
+      <hr className="border-black mt-4"/>
+
+<div className="grid grid-cols-2 mt-4 md:grid-cols-3 gap-4">
+    <div>
+        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg" alt=""/>
+    </div>
+    <div>
+        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-1.jpg" alt=""/>
+    </div>
+    <div>
+        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-2.jpg" alt=""/>
+    </div>
+    <div>
+        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-3.jpg" alt=""/>
+    </div>
+    <div>
+        <img className="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image-4.jpg" alt=""/>
+    
+</div>
+
+
+</div>
+</div>
     </div>
   );
 };
