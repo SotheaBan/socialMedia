@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
+import { jwtDecode } from "jwt-decode"; // Corrected import
 
 const Body = () => {
   const [posts, setPosts] = useState([]);
@@ -41,10 +41,11 @@ const Body = () => {
           setPosts(postsWithLikeState);
           setLoading(false);
 
-          // Fetch user details for all users who liked the posts
+          // Fetch user details for all users who liked the posts + post author
           const allUserIds = new Set(
             response.data.flatMap((post) => post.liked_by)
           );
+          allUserIds.add(response.data.map((post) => post.author)); // Add post author to the list
           fetchUserDetails(Array.from(allUserIds));
         })
         .catch((error) => {
@@ -68,11 +69,18 @@ const Body = () => {
           })
         )
       );
+
       const userInfo = {};
       usersData.forEach((response) => {
-        const { id, username } = response.data;
-        userInfo[id] = username;
+        const { id, username, profile_picture } = response.data;
+        const fullProfilePictureUrl = profile_picture
+          ? `http://127.0.0.1:8000${profile_picture}`
+          : "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"; // default image
+
+        userInfo[id] = { username, profile_picture: fullProfilePictureUrl };
       });
+
+      console.log("Fetched user info:", userInfo); // Debugging step
       setUsers((prevUsers) => ({ ...prevUsers, ...userInfo }));
     } catch (error) {
       console.error("Error fetching user details:", error);
@@ -196,18 +204,26 @@ const Body = () => {
               <img
                 className="w-10 h-10 rounded-xl md:w-20 md:h-20"
                 src={
-                  post.profile_picture ||
-                  "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"
+                  users[post.author]?.profile_picture ||
+                  "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg" // Fallback image
                 }
-                alt={post.author || "Author"}
+                alt={users[post.author]?.username || "Author"}
               />
               <div className="font-medium text-gray-700">
                 <div className="text-xl text-[#490057] font-bold">
-                  {users[post.author] || post.author}{" "}
+                  {users[post.author]?.username || post.author}{" "}
                 </div>
                 <div className="text-xs text-[#A303A0]">
                   {timeAgo(post.created_at)}
                 </div>
+              </div>
+            </div>
+
+            <div className="ml-6 flex gap-4 justify-start items-start">
+              <div className="flex flex-col">
+                <p className="text-lg md:text-xl text-[#490057] font-medium leading-relaxed tracking-wide">
+                  {post.content}
+                </p>
               </div>
             </div>
 
@@ -216,18 +232,9 @@ const Body = () => {
                 <img
                   src={post.image}
                   alt="Post Image"
-                  className="w-full object-cover"
+                  className="w-full max-w-4xl rounded-lg shadow-lg object-cover"
                 />
               )}
-            </div>
-
-            <div className="ml-6 flex gap-4 justify-start">
-              <p className="text-xl text-[#490057] font-medium">
-                {users[post.author] || post.author}
-              </p>
-              <p className="text-lg font-light text-[#490057]">
-                {post.content}
-              </p>
             </div>
 
             <div className="mt-3 text-sm text-gray-600 ml-6 flex gap-7">
@@ -277,7 +284,9 @@ const Body = () => {
             <ul className="mt-4">
               {selectedPostLikes.length > 0 ? (
                 selectedPostLikes.map((userId) => (
-                  <li key={userId}>{users[userId] || `User ${userId}`}</li>
+                  <li key={userId}>
+                    {users[userId]?.username || `User ${userId}`}
+                  </li>
                 ))
               ) : (
                 <li>No likes yet</li>
