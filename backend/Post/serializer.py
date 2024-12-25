@@ -14,6 +14,7 @@ class ListSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "likes",
+            "liked_by",
             "author",
         ]
 
@@ -29,6 +30,7 @@ class PostSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "likes",
+            "liked_by",
             "author",
         ]
 

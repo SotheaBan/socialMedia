@@ -53,15 +53,21 @@ def like_post(request, post_id):
 
         # Check if the user already liked the post
         if user in post.liked_by.all():
-            post.liked_by.remove(user)  # Unfollow (remove like)
-            post.likes -= 1  # Decrement like count
+            post.liked_by.remove(user)
+            post.likes -= 1
         else:
-            post.liked_by.add(user)  # Add like
-            post.likes += 1  # Increment like count
+            post.liked_by.add(user)
+            post.likes += 1
 
-        post.save()  # Save updated post
+        post.save()
 
-        return Response({"likes": post.likes}, status=status.HTTP_200_OK)
+        # Prepare the response
+        response_data = {
+            "likes": post.likes,
+            "liked_by": [user.username for user in post.liked_by.all()],
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
     except Post.DoesNotExist:
         return Response({"error": "Post not found"}, status=status.HTTP_404_NOT_FOUND)

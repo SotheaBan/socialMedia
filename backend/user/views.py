@@ -72,9 +72,7 @@ class CustomTokenObtainPairView(APIView):
             # Calculate time remaining (in minutes)
             now = timezone.now()
             # Convert exp_timestamp to a datetime object and calculate remaining time
-            exp_time = datetime.utcfromtimestamp(exp_timestamp).replace(
-                tzinfo=timezone.utc
-            )
+            exp_time = datetime.utcfromtimestamp(exp_timestamp).replace(tzinfo=pytz.UTC)
             time_remaining = (exp_time - now).total_seconds() / 60.0  # in minutes
         except TokenError:
             pass  # If there's an error in decoding the token, we just return None for exp_time

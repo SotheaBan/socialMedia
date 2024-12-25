@@ -8,6 +8,9 @@ const Body = () => {
   const [error, setError] = useState(null);
   const [accessToken, setAccessToken] = useState(null);
   const [userId, setUserId] = useState(null);
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const [selectedPostLikes, setSelectedPostLikes] = useState([]);
+  const [users, setUsers] = useState({}); // Store user info by user ID
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -15,14 +18,13 @@ const Body = () => {
       setAccessToken(token);
       try {
         const decoded = jwtDecode(token);
-        setUserId(decoded.user_id);
+        setUserId(decoded.user_id); // Extract user_id from token
       } catch (error) {
         console.error("Error decoding token:", error);
       }
     }
   }, []);
 
-  // Fetch posts from API
   useEffect(() => {
     if (accessToken) {
       axios
@@ -38,6 +40,12 @@ const Body = () => {
           });
           setPosts(postsWithLikeState);
           setLoading(false);
+
+          // Fetch user details for all users who liked the posts
+          const allUserIds = new Set(
+            response.data.flatMap((post) => post.liked_by)
+          );
+          fetchUserDetails(Array.from(allUserIds));
         })
         .catch((error) => {
           console.error("Error fetching posts:", error);
@@ -49,8 +57,36 @@ const Body = () => {
     }
   }, [accessToken]);
 
+  const fetchUserDetails = async (userIds) => {
+    try {
+      const usersData = await Promise.all(
+        userIds.map((userId) =>
+          axios.get(`http://127.0.0.1:8000/api/users/${userId}/`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          })
+        )
+      );
+      const userInfo = {};
+      usersData.forEach((response) => {
+        const { id, username } = response.data;
+        userInfo[id] = username;
+      });
+      setUsers((prevUsers) => ({ ...prevUsers, ...userInfo }));
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
+  };
+
+  const handleLikeCountClick = (likedBy) => {
+    setSelectedPostLikes(likedBy);
+    setShowLikesModal(true);
+  };
+
   const handleLikeClick = async (postId) => {
     try {
+      // Send the like/unlike request to the backend
       const response = await axios.post(
         `http://127.0.0.1:8000/api/post/${postId}/like/`,
         null,
@@ -61,32 +97,35 @@ const Body = () => {
         }
       );
 
-      // Get the current liked posts from localStorage
       let likedPosts = JSON.parse(localStorage.getItem("likedPosts")) || [];
 
+      // Toggle the like status for the current post
       if (likedPosts.includes(postId)) {
+        // If already liked, unlike the post
         likedPosts = likedPosts.filter((id) => id !== postId);
       } else {
+        // If not liked, like the post
         likedPosts.push(postId);
       }
 
-      // Save the updated likedPosts array back to localStorage
+      // Store the updated liked posts in localStorage
       localStorage.setItem("likedPosts", JSON.stringify(likedPosts));
 
-      // Optimistically update the state
+      // Update the posts state based on the new like count and like status
       setPosts((prevPosts) => {
-        const updatedPosts = prevPosts.map((post) => {
+        return prevPosts.map((post) => {
           if (post.id === postId) {
             const isLiked = likedPosts.includes(postId);
+            // Update likes count and isLiked status based on the backend response
             return {
               ...post,
-              likes: response.data.likes, // Update likes count
-              isLiked, // Update the isLiked status
+              likes: response.data.likes, // Update the like count
+              liked_by: response.data.liked_by, // Update the liked_by array
+              isLiked, // Update isLiked status
             };
           }
-          return post; // Return the post as-is if it's not the one being liked
+          return post;
         });
-        return updatedPosts;
       });
     } catch (error) {
       console.error("Error liking post:", error);
@@ -94,7 +133,11 @@ const Body = () => {
     }
   };
 
-  // Handle error and loading state
+  const closeLikesModal = () => {
+    setShowLikesModal(false);
+    setSelectedPostLikes([]);
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -103,7 +146,6 @@ const Body = () => {
     return <div>{error}</div>;
   }
 
-  // Time ago calculation
   const timeAgo = (timestamp) => {
     const now = new Date();
     const postTime = new Date(timestamp);
@@ -129,19 +171,19 @@ const Body = () => {
       <div className="flex gap-4 justify-center text-xl">
         <button
           type="button"
-          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray"
+          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-s-lg hover:bg-gray-100 hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700"
         >
           Following
         </button>
         <button
           type="button"
-          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray"
+          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700"
         >
           Follower
         </button>
         <button
           type="button"
-          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:text-blue-700 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray"
+          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:text-blue-700"
         >
           Post
         </button>
@@ -161,7 +203,7 @@ const Body = () => {
               />
               <div className="font-medium text-gray-700">
                 <div className="text-xl text-[#490057] font-bold">
-                  {post.author}
+                  {users[post.author] || post.author}{" "}
                 </div>
                 <div className="text-xs text-[#A303A0]">
                   {timeAgo(post.created_at)}
@@ -181,7 +223,7 @@ const Body = () => {
 
             <div className="ml-6 flex gap-4 justify-start">
               <p className="text-xl text-[#490057] font-medium">
-                {post.author}
+                {users[post.author] || post.author}
               </p>
               <p className="text-lg font-light text-[#490057]">
                 {post.content}
@@ -211,7 +253,14 @@ const Body = () => {
                     />
                   </svg>
                 </button>
-                {post.likes}
+                {post.likes > 0 && (
+                  <button
+                    onClick={() => handleLikeCountClick(post.liked_by)}
+                    className="text-[#490057]"
+                  >
+                    {post.likes} {post.likes === 1 ? "Like" : "Likes"}
+                  </button>
+                )}
               </div>
             </div>
 
@@ -219,6 +268,30 @@ const Body = () => {
           </li>
         ))}
       </ul>
+
+      {/* Likes Modal */}
+      {showLikesModal && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg w-1/2 max-w-md">
+            <h2 className="text-lg font-bold text-[#490057]">Liked by:</h2>
+            <ul className="mt-4">
+              {selectedPostLikes.length > 0 ? (
+                selectedPostLikes.map((userId) => (
+                  <li key={userId}>{users[userId] || `User ${userId}`}</li>
+                ))
+              ) : (
+                <li>No likes yet</li>
+              )}
+            </ul>
+            <button
+              className="mt-4 px-4 py-2 bg-[#A303A0] text-white rounded"
+              onClick={closeLikesModal}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
