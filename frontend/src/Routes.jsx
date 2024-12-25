@@ -12,6 +12,7 @@ import Following from "./pages/profiles/Following";
 import ProtectedRoute from "./ProtectedRoute";
 import LinkUp from './pages/chat/LinkUp';
 import TextPage from './pages/chat/TextPage';
+import Posted from "./pages/H-Post/Posted";
 
 
 const AppRoutes = () => {
@@ -73,6 +74,7 @@ const AppRoutes = () => {
       <Route path="*" element={<Navigate to="/home" />} />
       <Route path="/text" element={< TextPage/>} />
       <Route path="/linkUp" element={<LinkUp/>}  />
+      <Route path="/posted"  element={<Posted/>} />
     </Routes>
   );
 };

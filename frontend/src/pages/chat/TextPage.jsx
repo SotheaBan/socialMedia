@@ -1,7 +1,5 @@
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
 import React from 'react'
-
 const TextPage = () => {
   return (
     

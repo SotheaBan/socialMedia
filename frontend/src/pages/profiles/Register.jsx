@@ -27,7 +27,7 @@ const Register = () => {
       return;
     }
 
-    // Create FormData object
+    
     const formPayload = new FormData();
     formPayload.append("username", formData.username);
     formPayload.append("email", formData.email);
