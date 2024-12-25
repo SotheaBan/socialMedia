@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode"; // Corrected import
+import { jwtDecode } from "jwt-decode";
 
 const Body = () => {
   const [posts, setPosts] = useState([]);
@@ -10,22 +10,23 @@ const Body = () => {
   const [userId, setUserId] = useState(null);
   const [showLikesModal, setShowLikesModal] = useState(false);
   const [selectedPostLikes, setSelectedPostLikes] = useState([]);
-  const [users, setUsers] = useState({}); // Store user info by user ID
+  const [users, setUsers] = useState({});
+  const [animatingPostId, setAnimatingPostId] = useState(null);
 
-  // Get access token and user ID from local storage
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
       setAccessToken(token);
       try {
         const decoded = jwtDecode(token);
-        setUserId(decoded.user_id); // Extract user_id from token
+        setUserId(decoded.user_id);
       } catch (error) {
         console.error("Error decoding token:", error);
       }
     }
   }, []);
 
+  // Fetch posts and users' information
   useEffect(() => {
     if (accessToken) {
       axios
@@ -34,28 +35,23 @@ const Body = () => {
         })
         .then((response) => {
           const postsWithLikeState = response.data.map((post) => {
-            const likedPosts =
-              JSON.parse(localStorage.getItem("likedPosts")) || [];
-            const isLiked = likedPosts.includes(post.id);
+            const isLiked = post.liked_by.includes(userId);
             return { ...post, isLiked };
           });
           setPosts(postsWithLikeState);
           setLoading(false);
 
-          // Collect unique user IDs: from post authors and users who liked the posts
           const userIds = new Set(
             response.data.flatMap((post) => post.liked_by)
           );
 
-          // Make sure post.author is a valid user ID
           response.data.forEach((post) => {
             if (post.author && post.author !== "test") {
-              userIds.add(post.author); // add post author user ID
+              userIds.add(post.author);
             }
           });
 
-          console.log("User IDs to fetch:", Array.from(userIds)); // Debugging user IDs to fetch
-          fetchUserDetails(Array.from(userIds)); // Fetch details for these user IDs
+          fetchUserDetails(Array.from(userIds));
         })
         .catch((error) => {
           console.error("Error fetching posts:", error);
@@ -65,18 +61,13 @@ const Body = () => {
     } else {
       setLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, userId]);
 
   const fetchUserDetails = async (userIds) => {
-    // Filter out users already in the state to prevent redundant API calls
     const newUserIds = userIds.filter((userId) => !(userId in users));
 
     if (newUserIds.length > 0) {
       try {
-        // Add a debug log to check the userIds being passed
-        console.log("Fetching details for user IDs:", newUserIds);
-
-        // Make API requests for the new user IDs
         const usersData = await Promise.all(
           newUserIds.map((userId) =>
             axios.get(`http://127.0.0.1:8000/api/users/${userId}/`, {
@@ -87,34 +78,43 @@ const Body = () => {
           )
         );
 
-        // Process the user data and update the state
         const userInfo = {};
         usersData.forEach((response) => {
           const { id, username, profile_picture } = response.data;
           const fullProfilePictureUrl = profile_picture
             ? `http://127.0.0.1:8000${profile_picture}`
-            : "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"; // default image
+            : "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg";
 
           userInfo[id] = { username, profile_picture: fullProfilePictureUrl };
         });
 
-        // Merge the fetched user data into the current state
         setUsers((prevUsers) => ({ ...prevUsers, ...userInfo }));
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
-    } else {
-      console.log("All requested users are already fetched.");
     }
   };
 
-  const handleLikeCountClick = (likedBy) => {
-    setSelectedPostLikes(likedBy);
-    setShowLikesModal(true);
-  };
-
+  // Handle like click with optimistic update
   const handleLikeClick = async (postId) => {
+    setAnimatingPostId(postId);
+
+    setPosts((prevPosts) =>
+      prevPosts.map((post) => {
+        if (post.id === postId) {
+          const newIsLiked = !post.isLiked;
+          return {
+            ...post,
+            isLiked: newIsLiked,
+            likes: newIsLiked ? post.likes + 1 : post.likes - 1,
+          };
+        }
+        return post;
+      })
+    );
+
     try {
+      // Make API call to update like status
       const response = await axios.post(
         `http://127.0.0.1:8000/api/post/${postId}/like/`,
         null,
@@ -125,20 +125,10 @@ const Body = () => {
         }
       );
 
-      let likedPosts = JSON.parse(localStorage.getItem("likedPosts")) || [];
-
-      if (likedPosts.includes(postId)) {
-        likedPosts = likedPosts.filter((id) => id !== postId);
-      } else {
-        likedPosts.push(postId);
-      }
-
-      localStorage.setItem("likedPosts", JSON.stringify(likedPosts));
-
-      setPosts((prevPosts) => {
-        return prevPosts.map((post) => {
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => {
           if (post.id === postId) {
-            const isLiked = likedPosts.includes(postId);
+            const isLiked = response.data.liked_by.includes(userId);
             return {
               ...post,
               likes: response.data.likes,
@@ -147,12 +137,32 @@ const Body = () => {
             };
           }
           return post;
-        });
-      });
+        })
+      );
     } catch (error) {
       console.error("Error liking post:", error);
       setError("Failed to like post.");
+
+      // If there's an error, revert the optimistic update
+      setPosts((prevPosts) =>
+        prevPosts.map((post) => {
+          if (post.id === postId) {
+            const newIsLiked = !post.isLiked; // Revert like status
+            return {
+              ...post,
+              isLiked: newIsLiked, // Revert to the previous state
+              likes: newIsLiked ? post.likes - 1 : post.likes + 1, // Revert likes count
+            };
+          }
+          return post;
+        })
+      );
     }
+  };
+
+  const handleLikeCountClick = (likedBy) => {
+    setSelectedPostLikes(likedBy);
+    setShowLikesModal(true);
   };
 
   const closeLikesModal = () => {
@@ -257,7 +267,7 @@ const Body = () => {
                   onClick={() => handleLikeClick(post.id)}
                   className={`${
                     post.isLiked ? "text-pink-500" : "text-[#490057]"
-                  }`}
+                  } ${animatingPostId === post.id ? "animate-heart" : ""}`}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
