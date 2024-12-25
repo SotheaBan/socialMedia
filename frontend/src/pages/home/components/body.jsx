@@ -12,6 +12,7 @@ const Body = () => {
   const [selectedPostLikes, setSelectedPostLikes] = useState([]);
   const [users, setUsers] = useState({}); // Store user info by user ID
 
+  // Get access token and user ID from local storage
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {
@@ -41,12 +42,20 @@ const Body = () => {
           setPosts(postsWithLikeState);
           setLoading(false);
 
-          // Fetch user details for all users who liked the posts + post author
-          const allUserIds = new Set(
+          // Collect unique user IDs: from post authors and users who liked the posts
+          const userIds = new Set(
             response.data.flatMap((post) => post.liked_by)
           );
-          allUserIds.add(response.data.map((post) => post.author)); // Add post author to the list
-          fetchUserDetails(Array.from(allUserIds));
+
+          // Make sure post.author is a valid user ID
+          response.data.forEach((post) => {
+            if (post.author && post.author !== "test") {
+              userIds.add(post.author); // add post author user ID
+            }
+          });
+
+          console.log("User IDs to fetch:", Array.from(userIds)); // Debugging user IDs to fetch
+          fetchUserDetails(Array.from(userIds)); // Fetch details for these user IDs
         })
         .catch((error) => {
           console.error("Error fetching posts:", error);
@@ -59,31 +68,43 @@ const Body = () => {
   }, [accessToken]);
 
   const fetchUserDetails = async (userIds) => {
-    try {
-      const usersData = await Promise.all(
-        userIds.map((userId) =>
-          axios.get(`http://127.0.0.1:8000/api/users/${userId}/`, {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          })
-        )
-      );
+    // Filter out users already in the state to prevent redundant API calls
+    const newUserIds = userIds.filter((userId) => !(userId in users));
 
-      const userInfo = {};
-      usersData.forEach((response) => {
-        const { id, username, profile_picture } = response.data;
-        const fullProfilePictureUrl = profile_picture
-          ? `http://127.0.0.1:8000${profile_picture}`
-          : "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"; // default image
+    if (newUserIds.length > 0) {
+      try {
+        // Add a debug log to check the userIds being passed
+        console.log("Fetching details for user IDs:", newUserIds);
 
-        userInfo[id] = { username, profile_picture: fullProfilePictureUrl };
-      });
+        // Make API requests for the new user IDs
+        const usersData = await Promise.all(
+          newUserIds.map((userId) =>
+            axios.get(`http://127.0.0.1:8000/api/users/${userId}/`, {
+              headers: {
+                Authorization: `Bearer ${accessToken}`,
+              },
+            })
+          )
+        );
 
-      console.log("Fetched user info:", userInfo); // Debugging step
-      setUsers((prevUsers) => ({ ...prevUsers, ...userInfo }));
-    } catch (error) {
-      console.error("Error fetching user details:", error);
+        // Process the user data and update the state
+        const userInfo = {};
+        usersData.forEach((response) => {
+          const { id, username, profile_picture } = response.data;
+          const fullProfilePictureUrl = profile_picture
+            ? `http://127.0.0.1:8000${profile_picture}`
+            : "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"; // default image
+
+          userInfo[id] = { username, profile_picture: fullProfilePictureUrl };
+        });
+
+        // Merge the fetched user data into the current state
+        setUsers((prevUsers) => ({ ...prevUsers, ...userInfo }));
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    } else {
+      console.log("All requested users are already fetched.");
     }
   };
 
@@ -94,7 +115,6 @@ const Body = () => {
 
   const handleLikeClick = async (postId) => {
     try {
-      // Send the like/unlike request to the backend
       const response = await axios.post(
         `http://127.0.0.1:8000/api/post/${postId}/like/`,
         null,
@@ -107,29 +127,23 @@ const Body = () => {
 
       let likedPosts = JSON.parse(localStorage.getItem("likedPosts")) || [];
 
-      // Toggle the like status for the current post
       if (likedPosts.includes(postId)) {
-        // If already liked, unlike the post
         likedPosts = likedPosts.filter((id) => id !== postId);
       } else {
-        // If not liked, like the post
         likedPosts.push(postId);
       }
 
-      // Store the updated liked posts in localStorage
       localStorage.setItem("likedPosts", JSON.stringify(likedPosts));
 
-      // Update the posts state based on the new like count and like status
       setPosts((prevPosts) => {
         return prevPosts.map((post) => {
           if (post.id === postId) {
             const isLiked = likedPosts.includes(postId);
-            // Update likes count and isLiked status based on the backend response
             return {
               ...post,
-              likes: response.data.likes, // Update the like count
-              liked_by: response.data.liked_by, // Update the liked_by array
-              isLiked, // Update isLiked status
+              likes: response.data.likes,
+              liked_by: response.data.liked_by,
+              isLiked,
             };
           }
           return post;
@@ -145,14 +159,6 @@ const Body = () => {
     setShowLikesModal(false);
     setSelectedPostLikes([]);
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (error) {
-    return <div>{error}</div>;
-  }
 
   const timeAgo = (timestamp) => {
     const now = new Date();
@@ -173,6 +179,14 @@ const Body = () => {
       return `${diffInSecs} second${diffInSecs > 1 ? "s" : ""} ago`;
     }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="p-4 md:p-4 rounded-xl text-[#A303A0] flex flex-col bg-white h-screen">
@@ -205,13 +219,13 @@ const Body = () => {
                 className="w-10 h-10 rounded-xl md:w-20 md:h-20"
                 src={
                   users[post.author]?.profile_picture ||
-                  "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg" // Fallback image
+                  "https://images.pexels.com/photos/14653174/pexels-photo-14653174.jpeg"
                 }
                 alt={users[post.author]?.username || "Author"}
               />
               <div className="font-medium text-gray-700">
                 <div className="text-xl text-[#490057] font-bold">
-                  {users[post.author]?.username || post.author}{" "}
+                  {users[post.author]?.username || post.author}
                 </div>
                 <div className="text-xs text-[#A303A0]">
                   {timeAgo(post.created_at)}
