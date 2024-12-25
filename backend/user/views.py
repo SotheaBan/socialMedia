@@ -13,6 +13,8 @@ from rest_framework_simplejwt.exceptions import TokenError
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.pagination import PageNumberPagination
 import pytz
+from notification.models import Notification
+from notification.views import send_push_notification
 
 # Django Imports
 from django.shortcuts import get_object_or_404
@@ -74,7 +76,7 @@ class CustomTokenObtainPairView(APIView):
         custom_response_data = {
             "access_token": access_token,
             "refresh_token": str(refresh),
-
+            "user_id": str(user.id),
             "id": user.id,
             "username": user.username,
             "email": user.email,
@@ -298,6 +300,20 @@ class FollowUnfollowView(APIView):
 
         # Follow the user
         user.follow(user_to_follow)
+
+        # Create notification
+        notification = Notification.objects.create(
+            user=user_to_follow,  # Send notification to user being followed
+            message=f"{user.username} started following you",
+            notification_type='follow'
+        )
+
+        # Send push notification
+        send_push_notification(
+            user_id=str(user_to_follow.id),
+            notification_type='follow',
+            message=f"{user.username} started following you"
+        )
 
         return Response(
             {

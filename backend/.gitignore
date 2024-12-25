@@ -74,3 +74,5 @@ __pycache__/
 
 # Ignore node_modules
 node_modules/
+
+credentials

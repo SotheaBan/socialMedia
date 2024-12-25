@@ -28,7 +28,7 @@ function LoginPage() {
 
   // Function to handle login
   const loginUser = async (email, password) => {
-    setLoading(true); // Start loading state
+    setLoading(true);
     try {
       console.log("Sending login request...");
       const response = await axios.post("http://127.0.0.1:8000/api/token/", {
@@ -39,27 +39,33 @@ function LoginPage() {
       console.log("Login response data:", response.data);
 
       if (
-        response.data &&
-        response.data.data.access_token &&
-        response.data.data.refresh_token
+        response.data?.data?.access_token &&
+        response.data?.data?.refresh_token &&
+        response.data?.data?.user_id
       ) {
-        // Store the tokens in localStorage
+        // Store tokens and user ID
         localStorage.setItem("accessToken", response.data.data.access_token);
         localStorage.setItem("refreshToken", response.data.data.refresh_token);
-        console.log(
-          "Access token stored in localStorage:",
-          response.data.data.access_token
-        );
+        localStorage.setItem("userId", response.data.data.user_id);
 
-        // Redirect to home after successful login
+        console.log("Access token stored:", response.data.data.access_token);
+        console.log("User ID stored:", response.data.data.user_id);
+
+        // Initialize Firebase notifications
+        try {
+          await initializeNotifications(response.data.data.user_id);
+          console.log("Firebase notifications initialized");
+        } catch (error) {
+          console.error("Error initializing notifications:", error);
+        }
+
         navigate("/home");
       } else {
-        console.error("No access token or refresh token received.");
-        setError("No access token or refresh token received.");
+        setError("Invalid response from server");
       }
     } catch (error) {
-      console.error("Error logging in:", error);
-      setError("Invalid credentials. Please try again.");
+      console.error("Login error:", error);
+      setError(error.response?.data?.message || "Invalid credentials");
     } finally {
       setLoading(false);
     }

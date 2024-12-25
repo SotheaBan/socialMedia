@@ -13,10 +13,21 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from datetime import timedelta
 import os
-
+import firebase_admin
+from firebase_admin import credentials
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#firebase
+FIREBASE_CREDS_PATH = os.path.join(BASE_DIR, 'credentials', 'firebase-adminsdk.json')
+
+try:
+    cred = credentials.Certificate(FIREBASE_CREDS_PATH)
+    firebase_admin.initialize_app(cred)
+except FileNotFoundError:
+    print(f"Warning: Firebase credentials file not found at {FIREBASE_CREDS_PATH}")
+    # Optional: Initialize Firebase without credentials for development
+    firebase_admin.initialize_app()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/

@@ -1,20 +1,22 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Notification
 from .models import User
 from .serializer import NotificationSerializer
-
+from firebase_admin import messaging
+from .models import DeviceToken
 
 class NotificationListView(APIView):
-    # permission_classes = [IsAuthenticated]  # Temporarily removed for testing
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Temporarily fetching notifications for all users for testing purposes
-        notifications = Notification.objects.all().order_by('-created_at')  # For testing only
-        serializers = NotificationSerializer(notifications, many=True)
-        return Response(serializers.data, status=200)
+        # Only fetch notifications for the authenticated user
+        notifications = Notification.objects.filter(user=request.user).order_by('-created_at')
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data, status=200)
 
 
 class MarkNotificationAsReadView(APIView):
@@ -52,3 +54,41 @@ class CreateNotificationView(APIView):
         serializer = NotificationSerializer(notification)
         return Response(serializer.data, status=201)
 
+class RegisterDeviceView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        user = request.user
+        token = request.data.get('fcm_token')
+        
+        if not token:
+            return Response({'error': 'Token is required'}, status=400)
+            
+        DeviceToken.objects.get_or_create(user=user, token=token)
+        return Response({'status': 'success'}, status=201)
+
+def send_push_notification(user_id, notification_type, message):
+    try:
+        # Get all device tokens for the user
+        tokens = DeviceToken.objects.filter(user_id=user_id).values_list('token', flat=True)
+        
+        if not tokens:
+            return
+            
+        # Construct message
+        message = messaging.MulticastMessage(
+            tokens=list(tokens),
+            notification=messaging.Notification(
+                title=f"New {notification_type}",
+                body=message
+            ),
+            data={
+                'type': notification_type
+            }
+        )
+        
+        # Send message
+        response = messaging.send_multicast(message)
+        return response
+    except Exception as e:
+        print(f"Error sending push notification: {e}")
