@@ -10,14 +10,14 @@ import EditProfile from "./pages/profiles/EditProfile";
 import Followers from "./pages/profiles/Followers";
 import Following from "./pages/profiles/Following";
 import ProtectedRoute from "./ProtectedRoute";
-import LinkUp from './pages/chat/LinkUp';
-import TextPage from './pages/chat/TextPage';
-import Posted from "./pages/H-Post/Posted";
+import Body from "./pages/home/components/body";
+
 
 
 const AppRoutes = () => {
   return (
     <Routes>
+      
       {/* Redirect root URL to /home */}
       <Route path="/" element={<Navigate to="/home" />} />
 
@@ -26,9 +26,9 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/users" element={<UserList />} />
       <Route path="/home" element={<Homepage />} />
-    
-
-      {/* Protected Routes */}
+      <Route path="/" element={<Body />} />
+      <Route path="/post" element={<PostPage />} />
+ {/* Protected Routes */}
       <Route
         path="/post"
         element={
@@ -72,9 +72,8 @@ const AppRoutes = () => {
 
       {/* Catch-all for invalid routes */}
       <Route path="*" element={<Navigate to="/home" />} />
-      <Route path="/text" element={< TextPage/>} />
-      <Route path="/linkUp" element={<LinkUp/>}  />
-      <Route path="/posted"  element={<Posted/>} />
+     
+      
     </Routes>
   );
 };

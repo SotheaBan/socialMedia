@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const Body = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [activePostId, setActivePostId] = useState(null); // State to track the active post's dropdown visibility
+
+  // Fetch posts from Django API
   const [accessToken, setAccessToken] = useState(null);
   const [userId, setUserId] = useState(null);
   const [showLikesModal, setShowLikesModal] = useState(false);
@@ -209,19 +213,21 @@ const Body = () => {
         </button>
         <button
           type="button"
-          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700"
+          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:ring-blue-700 focus:text-blue-700 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray"
+          onClick={() => setActiveTab("Follower")}
         >
           Follower
         </button>
         <button
           type="button"
-          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:text-blue-700"
+          className="px-4 py-2 text-lg font-medium text-gray-900 bg-white rounded-e-lg hover:bg-gray-100 hover:text-blue-700 focus:text-blue-700 dark:border-gray-700 dark:text-gray dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-gray"
+          onClick={() => setActiveTab("Post")}
         >
-          Post
+          <Link to={`/home`}>Post</Link>
         </button>
       </div>
       <hr className="w-full mt-7" />
-      <ul className="flex flex-col items-center overflow-y-auto max-h-screen overflow-clip">
+      <ul className=" flex flex-col items-center overflow-y-auto max-h-screen overflow-clip">
         {[...posts].reverse().map((post) => (
           <li key={post.id} className="mt-5 w-full max-w-4xl">
             <div className="flex items-center gap-4 pt-6">
@@ -294,6 +300,38 @@ const Body = () => {
                 )}
               </div>
             </div>
+
+            {activePostId === post.id && (
+              <div
+                id="dropdown"
+                className="w-full z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-lg"
+              >
+                <h1 className="p-2">Comments</h1>
+                <ul className="py-2 text-sm text-gray-700 dark:text-gray-200 p-2 gap-2">
+                  {comments[post.id]?.map((comment) => (
+                    <li key={comment.id} className="pt-2">
+                      <div className="flex items-center gap-4 pl-2">
+                        <img
+                          className="w-6 h-6 rounded-xl md:w-10 md:h-10"
+                          src={`http://127.0.0.1:8000${userProfile.profile_picture}`}
+                          alt={comment.author || "Author"}
+                        />
+                        <div className="font-medium text-gray-700">
+                          <div className="text-sm text-[#490057] font-bold">
+                            {comment.author}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="ml-10 flex gap-4 justify-start">
+                        <p className="text-lg font-light text-[#490057]">
+                          {comment.content}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <hr className="w-full mt-7" />
           </li>
