@@ -12,6 +12,7 @@ import Following from "./pages/profiles/Following";
 import ProtectedRoute from "./ProtectedRoute";
 import LinkUp from './pages/chat/LinkUp';
 import TextPage from './pages/chat/TextPage';
+import NotificationPage from "./pages/notification/notificationPage";
 
 
 const AppRoutes = () => {
@@ -25,7 +26,9 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/users" element={<UserList />} />
       <Route path="/home" element={<Homepage />} />
-    
+
+      <Route path="/notifications" element={<NotificationPage />} />
+
 
       {/* Protected Routes */}
       <Route
