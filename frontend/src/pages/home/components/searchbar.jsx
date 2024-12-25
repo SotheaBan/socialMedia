@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 function SearchBar({ setSearchResults }) {
     const [query, setQuery] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [localResults, setLocalResults] = useState({ users: [], posts: [] });
+    const [showSearchBox, setShowSearchBox] = useState(false);
+    const searchRef = useRef(null);
 
     const getImageUrl = (image) => {
         if (!image) return null;
         return image.startsWith('http') ? image : `http://127.0.0.1:8000${image}`;
     };
-
 
     useEffect(() => {
         const debounceTimer = setTimeout(async () => {
@@ -36,25 +37,63 @@ function SearchBar({ setSearchResults }) {
         return () => clearTimeout(debounceTimer);
     }, [query, setSearchResults]);
 
+    // Close search box if clicked outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowSearchBox(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
+
     return (
-        <div className='col-span-4 p-5'>
-            <div className="w-full flex flex-col relative">
-                <div className="flex px-4 py-3 rounded-md border-2 overflow-hidden font-[sans-serif] gap-2 bg-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6 text-[#490057]">
-                        <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
-                        <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clipRule="evenodd" />
-                    </svg>
-                    <input
-                        type="text"
-                        value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search Something..."
-                        className="w-full outline-none bg-transparent text-gray-600 text-sm m-1"
-                    />
-                </div>
-                
+        <div className='col-span-2 p-5'>
+            <div className="relative" ref={searchRef}>
+                {/* Search Icon */}
+                {!showSearchBox && (
+                   <button
+                   onClick={() => setShowSearchBox(true)}
+                   className="text-2xl p-3 bg-gray-200 rounded-full shadow hover:bg-gray-300 focus:outline-none "
+                 >
+                   🔍
+                 </button>
+                )}
+
+                {/* Search Box with Transition */}
+                <div
+    className={`absolute top-0 left-0 w-full bg-white  rounded-md transition-transform duration-200 ease-in-out ${
+        showSearchBox ? 'transform translate-y-0 opacity-100' : 'transform -translate-y-full opacity-0'
+    }`}
+>
+{showSearchBox && (
+  <div className="flex items-center px-4 py-3 rounded-md border-2 overflow-hidden font-[sans-serif] gap-2 w-full ">
+    <input
+      type="text"
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+      placeholder="Search Something..."
+      className="w-full outline-none bg-transparent text-gray-600 text-sm m-1"
+    />
+    <button
+      onClick={() => setShowSearchBox(false)}
+      className="text-xl text-gray-500 hover:text-gray-700 focus:outline-none"
+    >
+      ✖
+    </button>
+  </div>
+)}
+
+</div>
+
+
                 {/* Search Results Dropdown */}
-                {(query.trim() && (localResults.users.length > 0 || localResults.posts.length > 0)) && (
+                {showSearchBox && query.trim() && (localResults.users.length > 0 || localResults.posts.length > 0) && (
                     <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-md shadow-lg z-50 max-h-96 overflow-y-auto">
                         {/* Users Section */}
                         {localResults.users.length > 0 && (

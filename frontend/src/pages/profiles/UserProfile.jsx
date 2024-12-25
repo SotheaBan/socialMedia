@@ -11,8 +11,8 @@ const UserProfile = () => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [followersList, setFollowersList] = useState([]);
   const [followingList, setFollowingList] = useState([]);
+  const [userPostd, setUserPosts] = useState([]);
 
-  const [posts, setPosts] = useState([]);
   const navigate = useNavigate();
 
 
@@ -21,6 +21,7 @@ const UserProfile = () => {
   const accessToken = localStorage.getItem("accessToken");
   const decodedToken = accessToken ? jwtDecode(accessToken) : null;
   const currentUserId = decodedToken ? decodedToken.user_id : null;
+ 
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -147,6 +148,9 @@ const UserProfile = () => {
     return <p className="text-center py-4 text-red-600">{error}</p>;
   }
 
+ 
+
+
   return (
     <div className="bg-gray-100 min-h-screen py-8">
       <div className="container mx-auto px-6 md:px-12">
@@ -252,22 +256,14 @@ const UserProfile = () => {
      
       <hr className="border-black mt-6"/>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {posts.map((post) => (
-            post.image && (
-              <div key={post.id}>
-                <img
-                  className="h-auto max-w-full rounded-lg"
-                  src={`http://127.0.0.1:8000/api/post/${image}`}
-                  alt={post.title || "Post Image"}
-                />
-              </div>
-            )
-          ))}
-        </div>
-</div>
+      <div class="grid mt-3 grid-cols-2 md:grid-cols-3 gap-4">
+    <div>
+        <img class="h-auto max-w-full rounded-lg" src="https://flowbite.s3.amazonaws.com/docs/gallery/square/image.jpg" alt=""/>
     </div>
-  );
+    </div>
+    </div>
+    </div>
+      );
 };
 
 export default UserProfile;
