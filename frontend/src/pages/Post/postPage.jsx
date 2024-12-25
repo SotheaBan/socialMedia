@@ -1,10 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 function PostPage() {
 
   const [title, setTitle] = useState(''); // Store title
   const [file, setFile] = useState(null); // Store the file
-  const [author,setAuthor] = useState("a8c8e4ec-d604-45de-9b74-d6d626c9c231")
+  const [author,setAuthor] = useState('')
+  const [accessToken, setAccessToken] = useState(null);
+
+
+  useEffect(() =>{
+
+    const token = localStorage.getItem("accessToken");
+    console.log('post page: ',token)
+
+    if (token) {
+      setAccessToken(token);
+      try {
+        const decoded = jwtDecode(token);
+        console.log("Decoded User Data:", decoded);
+        setAuthor(decoded.user_id)
+        console.log('User id=' , decoded.user_id)
+        
+      } catch (err) {
+        console.error("Token decoding error:", err);
+        setAccessToken(null);
+      }
+    } else {
+      console.log("No access token found in LocalStorage.");
+    }
+  })
 
   // Handle title change
   const handleTitleChange = (e) => {
@@ -28,11 +53,13 @@ function PostPage() {
       alert("Image are required!");
       return;
     }
+    
 
     const formData = new FormData();
     formData.append("content", title);
     formData.append("image", file);
     formData.append("author", author);
+    
 
     try {
       const response = await fetch("http://127.0.0.1:8000/api/post/", {

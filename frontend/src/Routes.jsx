@@ -14,6 +14,7 @@ import LinkUp from './pages/chat/LinkUp';
 import TextPage from './pages/chat/TextPage';
 import NotificationPage from "./pages/notification/notificationPage";
 
+
 const AppRoutes = () => {
   return (
     <Routes>
@@ -25,7 +26,9 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/users" element={<UserList />} />
       <Route path="/home" element={<Homepage />} />
+
       <Route path="/notifications" element={<NotificationPage />} />
+
 
       {/* Protected Routes */}
       <Route
