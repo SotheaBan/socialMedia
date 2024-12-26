@@ -96,8 +96,7 @@ const Body = () => {
     }
   };
   
-  
-
+ 
   return (
     <div className="p-4 md:p-4 rounded-xl text-[#A303A0] flex flex-col bg-white h-screen">
       <div className="flex gap-4 justify-center text-xl ">
