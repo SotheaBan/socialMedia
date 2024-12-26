@@ -25,7 +25,6 @@ const AppRoutes = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/users" element={<UserList />} />
       <Route path="/home" element={<Homepage />} />
-      <Route path="/notifications" element={<NotificationPage />} />
 
       {/* Protected Routes */}
       <Route
@@ -68,11 +67,19 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch-all for invalid routes */}
       <Route path="*" element={<Navigate to="/home" />} />
-      <Route path="/text" element={< TextPage/>} />
-      <Route path="/linkUp" element={<LinkUp/>}  />
+      <Route path="/text" element={< TextPage />} />
+      <Route path="/linkUp" element={<LinkUp />} />
     </Routes>
   );
 };

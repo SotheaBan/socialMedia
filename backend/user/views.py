@@ -76,7 +76,7 @@ class CustomTokenObtainPairView(APIView):
         custom_response_data = {
             "access_token": access_token,
             "refresh_token": str(refresh),
-            "user_id": str(user.id),
+
             "id": user.id,
             "username": user.username,
             "email": user.email,

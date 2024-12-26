@@ -1,7 +1,7 @@
 // src/pages/notification/NotificationPage.jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Add this
+import React, { useState, useEffect, useCallback } from 'react';
+import axiosInstance from '../../utils/axiosConfig';
+import { getUserId } from '../../utils/authHelper';
 import Navbar from '../home/components/navbar';
 import Sidebar from '../home/components/side_bar';
 import { initializeNotifications } from '../../services/notificaionService';
@@ -17,56 +17,34 @@ const NotificationPage = () => {
   const [filterUnread, setFilterUnread] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // Add this
+
+  const handleNewNotification = useCallback((notification) => {
+    setNotifications((prev) => [notification, ...prev]);
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
-      const accessToken = localStorage.getItem('accessToken');
-      
-      if (!accessToken) {
-        navigate('/login');
-        return;
-      }
-
       try {
-        const response = await axios.get('http://127.0.0.1:8000/api/notification', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
+        const response = await axiosInstance.get('/notification');
         if (response.data) {
           setNotifications(response.data);
         }
       } catch (err) {
-        if (err.response?.status === 401) {
-          localStorage.removeItem('accessToken');
-          navigate('/login');
-        } else {
-          console.error('Error fetching notifications:', err);
-          setError('Failed to load notifications');
-        }
+        console.error('Error fetching notifications:', err);
+        setError('Failed to load notifications');
       } finally {
         setLoading(false);
       }
     };
 
-    // Initialize notifications and fetch data
     const setupNotifications = async () => {
-      const userId = localStorage.getItem('userId');
-      const accessToken = localStorage.getItem('accessToken');
-
-      if (!userId || !accessToken) {
-        setError('Please login to view notifications');
-        setLoading(false);
-        navigate('/login');
-        return;
-      }
-
       try {
-        await initializeNotifications(userId);
+        const userId = getUserId();
+        const unsubscribe = await initializeNotifications(userId, handleNewNotification);
         await fetchNotifications();
+        return () => {
+          if (unsubscribe) unsubscribe();
+        };
       } catch (err) {
         console.error('Error setting up notifications:', err);
         setError('Failed to initialize notifications');
@@ -75,26 +53,15 @@ const NotificationPage = () => {
     };
 
     setupNotifications();
-  }, [navigate]);
-
+  }, [handleNewNotification]);
 
   const markAllAsRead = async () => {
-    const accessToken = localStorage.getItem('accessToken');
-
     try {
       await Promise.all(
         notifications
           .filter(n => !n.is_read)
           .map(notification =>
-            axios.post(
-              `http://127.0.0.1:8000/api/notifications/${notification.id}/read/`,
-              {},
-              {
-                headers: {
-                  Authorization: `Bearer ${accessToken}`
-                }
-              }
-            )
+            axiosInstance.post(`/notifications/${notification.id}/read/`)
           )
       );
 
@@ -107,19 +74,8 @@ const NotificationPage = () => {
   };
 
   const markAsRead = async (notificationId) => {
-    const accessToken = localStorage.getItem('accessToken');
-
     try {
-      await axios.post(
-        `http://127.0.0.1:8000/api/notifications/${notificationId}/read/`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        }
-      );
-
+      await axiosInstance.post(`/notifications/${notificationId}/read/`);
       setNotifications(prev =>
         prev.map(notification =>
           notification.id === notificationId
