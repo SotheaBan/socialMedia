@@ -111,6 +111,7 @@ function Navbar() {
                   >
                     Logout
                   </button>
+                  
                   <Link
                     to={`/profile/${userProfile.id}`}
                     className="w-full text-blue-500 text-sm "

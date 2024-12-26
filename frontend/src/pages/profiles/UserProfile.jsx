@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import Sidebar from "../home/components/side_bar";
+import Navbar from "../home/components/navbar";
 
 const UserProfile = () => {
   const { userId } = useParams();
@@ -151,9 +153,14 @@ const UserProfile = () => {
  
 
 
-  return (
-    <div className="bg-gray-100 min-h-screen py-8">
-      <div className="container mx-auto px-6 md:px-12">
+  return (<div className="bg-gray-100 min-h-screen ">
+     <Navbar />
+    <div className="grid grid-cols-7 h-screen overflow-hidden">
+                <div className="md:bg-[#490057] h-full overflow-hidden">
+                    <Sidebar />
+                </div>
+                <div className="col-span-7 h-screen  md:col-span-5 overflow-y-scroll mb-28">
+                <div className="container mx-auto px-6 md:px-12">
         <header className="flex flex-col items-center md:flex-row md:justify-between mb-8">
           <div className="w-40 h-40 mb-6 md:mb-0">
             <img
@@ -222,6 +229,9 @@ const UserProfile = () => {
         </header>
       </div>
       <div>
+                </div> 
+               
+      
       <div className="w-full">
               <div className="grid grid-cols-2 ">
                 <div className=" col-span-1 h-24">
@@ -263,6 +273,8 @@ const UserProfile = () => {
     </div>
     </div>
     </div>
+    </div>
+
       );
 };
 
